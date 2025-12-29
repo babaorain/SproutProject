@@ -50,18 +50,20 @@
 
         /* 統一的輸入框樣式 */
         .form-input {
+            display: block;
             width: 100%;
-            max-width: 100%; /* 防止超出容器 */
-            min-width: 0;    /* 允許彈性縮小 */
+            min-width: 0;     /* 關鍵修正：允許在 Flex/Grid 容器中縮小，防止手機版超出 */
+            height: 48px;     /* 關鍵修正：強制固定高度，解決 Date 與 Number 輸入框高度不一致導致的對齊問題 */
             border-radius: 0.5rem;
             border-width: 1px;
             border-color: #cbd5e1;
             background-color: #f8fafc;
-            padding: 0.75rem;
+            padding: 0 0.75rem; /* 上下 padding 由 height 控制，左右保持 */
             font-size: 0.95rem;
             transition: all 0.2s;
             color: #334155;
             box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            box-sizing: border-box; /* 確保 padding 不會增加寬度 */
         }
 
         .form-input:focus {
@@ -70,6 +72,12 @@
             box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
             outline: none;
             z-index: 10;
+        }
+        
+        /* 針對 Textarea 覆寫高度限制 */
+        textarea.form-input {
+            height: auto;
+            padding: 0.75rem;
         }
 
         /* 卡片式 Radio 優化 */
@@ -163,44 +171,48 @@
                             </h2>
                         </div>
                         <div class="p-4 md:p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
+                            <div class="w-full">
                                 <label class="block text-sm font-semibold text-slate-700 mb-1">評估日期</label>
                                 <input type="date" id="date" name="date" class="form-input" required />
                             </div>
-                            <div>
+                            
+                            <div class="w-full">
                                 <label class="block text-sm font-semibold text-slate-700 mb-1">病歷號</label>
-                                <div class="relative">
+                                <div class="relative w-full">
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">#</div>
                                     <input type="text" name="chartNo" class="form-input pl-8" placeholder="例如: 12345678" required />
                                 </div>
                             </div>
-                            <div>
+                            
+                            <div class="w-full">
                                 <label class="block text-sm font-semibold text-slate-700 mb-1">個案姓名</label>
                                 <input type="text" name="name" class="form-input" placeholder="請輸入姓名" required />
                             </div>
+                            
                             <div class="grid grid-cols-2 gap-4">
-                                <div>
+                                <div class="w-full">
                                     <label class="block text-sm font-semibold text-slate-700 mb-1">出生日期</label>
                                     <input type="date" id="dob" name="dob" onchange="calculateAge()" class="form-input" required />
                                 </div>
-                                <div>
+                                <div class="w-full">
                                     <label class="block text-sm font-semibold text-slate-700 mb-1">年齡</label>
-                                    <input type="number" id="age" name="age" class="form-input bg-gray-200 cursor-not-allowed" readonly tabindex="-1" />
+                                    <input type="number" id="age" name="age" class="form-input bg-gray-200 cursor-not-allowed text-center font-bold" readonly tabindex="-1" />
                                 </div>
                             </div>
+                            
                             <div class="md:col-span-2">
                                 <label class="block text-sm font-semibold text-slate-700 mb-2">性別</label>
                                 <div class="grid grid-cols-2 gap-4">
-                                    <label class="cursor-pointer relative">
+                                    <label class="cursor-pointer relative w-full">
                                         <input type="radio" name="gender" value="Male" class="card-radio sr-only" />
-                                        <div class="border border-slate-300 rounded-lg p-3 flex items-center justify-center gap-2 hover:bg-slate-50 transition-all">
+                                        <div class="h-[48px] border border-slate-300 rounded-lg flex items-center justify-center gap-2 hover:bg-slate-50 transition-all bg-white">
                                             <span class="text-slate-600 font-medium">男性</span>
                                             <svg class="w-4 h-4 text-primary-600 check-icon opacity-0 transition-opacity absolute right-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                                         </div>
                                     </label>
-                                    <label class="cursor-pointer relative">
+                                    <label class="cursor-pointer relative w-full">
                                         <input type="radio" name="gender" value="Female" class="card-radio sr-only" />
-                                        <div class="border border-slate-300 rounded-lg p-3 flex items-center justify-center gap-2 hover:bg-slate-50 transition-all">
+                                        <div class="h-[48px] border border-slate-300 rounded-lg flex items-center justify-center gap-2 hover:bg-slate-50 transition-all bg-white">
                                             <span class="text-slate-600 font-medium">女性</span>
                                             <svg class="w-4 h-4 text-primary-600 check-icon opacity-0 transition-opacity absolute right-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                                         </div>
