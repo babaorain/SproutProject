@@ -221,12 +221,20 @@
                             </div>
 
                             <div class="w-full">
+                                <label class="block text-sm font-semibold text-slate-700 mb-1">院區</label>
+                                <select name="hospitalBranch" class="form-input">
+                                    <option value="高醫本院">高醫本院</option>
+                                    <option value="高醫岡山">高醫岡山</option>
+                                    <option value="小港醫院">小港醫院</option>
+                                    <option value="信義醫院">信義醫院</option>
+                                    <option value="部立屏東醫院">部立屏東醫院</option>
+                                </select>
+                            </div>
+
+                            <div class="w-full">
                                 <label class="block text-sm font-semibold text-slate-700 mb-1">病歷號</label>
                                 <div class="relative w-full">
-                                    <div
-                                        class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                                        #</div>
-                                    <input type="text" name="chartNo" class="form-input pl-8" placeholder="例如: 12345678"
+                                    <input type="text" name="chartNo" class="form-input" placeholder="例如: 12345678"
                                         required />
                                 </div>
                             </div>
@@ -525,9 +533,32 @@
                             </svg>
                         </summary>
                         <div class="p-4 md:p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <input type="text" name="cancerType" class="form-input"
-                                placeholder="癌症種類 (例如: Breast CA)" />
-                            <input type="text" name="cancerLocation" class="form-input" placeholder="癌症位置 (例如: Left)" />
+                            <div>
+                                <div class="flex justify-between items-center mb-1">
+                                    <label class="text-sm font-semibold text-slate-700">癌症種類</label>
+                                    <div class="flex gap-1 flex-wrap justify-end">
+                                        <button type="button" onclick="appendTx('cancerType', '大腸直腸癌')"
+                                            class="chip text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded border border-blue-100 hover:bg-blue-100">大腸直腸癌</button>
+                                        <button type="button" onclick="appendTx('cancerType', '非小細胞肺癌')"
+                                            class="chip text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded border border-blue-100 hover:bg-blue-100">非小細胞肺癌</button>
+                                        <button type="button" onclick="appendTx('cancerType', '乳癌')"
+                                            class="chip text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded border border-blue-100 hover:bg-blue-100">乳癌</button>
+                                        <button type="button" onclick="appendTx('cancerType', '肝癌')"
+                                            class="chip text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded border border-blue-100 hover:bg-blue-100">肝癌</button>
+                                        <button type="button" onclick="appendTx('cancerType', '血液腫瘤癌症')"
+                                            class="chip text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded border border-blue-100 hover:bg-blue-100">血液腫瘤癌症</button>
+                                    </div>
+                                </div>
+                                <input type="text" name="cancerType" class="form-input" placeholder="例如: Breast CA" />
+                            </div>
+                            <div>
+                                <div class="flex justify-between items-center mb-1">
+                                    <label class="text-sm font-semibold text-slate-700">癌症位置</label>
+                                    <!-- Spacer to align with Cancer Type buttons row -->
+                                    <div class="h-[22px]"></div>
+                                </div>
+                                <input type="text" name="cancerLocation" class="form-input" placeholder="例如: Left" />
+                            </div>
 
                             <div class="md:col-span-2 bg-slate-50 p-4 rounded-lg border border-slate-200">
                                 <label class="block text-sm font-semibold mb-2">遠端轉移狀況</label>
@@ -741,7 +772,8 @@
                             </div>
                             <input type="text" id="searchInput"
                                 class="w-full pl-10 pr-4 py-3 rounded-lg border border-slate-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition"
-                                placeholder="輸入姓名、病歷號或出生日期..." onkeydown="if(event.key==='Enter') searchData()" />
+                                placeholder="輸入姓名、病歷號、出生日期、院區或評估日期..."
+                                onkeydown="if(event.key==='Enter') searchData()" />
                         </div>
                         <button onclick="searchData()"
                             class="bg-primary-600 text-white px-6 rounded-lg font-bold hover:bg-primary-700 transition shadow-sm">查詢</button>
@@ -941,16 +973,16 @@
             ]
         };
 
-function openReferenceModal() {
-const modal = document.getElementById('detailModal');
-const content = document.getElementById('detailContent');
-const title = modal.querySelector('h3');
+        function openReferenceModal() {
+            const modal = document.getElementById('detailModal');
+            const content = document.getElementById('detailContent');
+            const title = modal.querySelector('h3');
 
-title.innerText = "選擇運動特殊考量";
+            title.innerText = "選擇運動特殊考量";
 
-// Helper function to render a category group
-const renderGroup = (groupData, prefix) => {
-return groupData.map((group, gIndex) => `
+            // Helper function to render a category group
+            const renderGroup = (groupData, prefix) => {
+                return groupData.map((group, gIndex) => `
 <div class="mb-4 last:mb-0 bg-slate-50 rounded-lg border border-slate-200 overflow-hidden">
     <div class="px-4 py-2 bg-slate-100 border-b border-slate-200 font-bold text-slate-700 flex justify-between items-center cursor-pointer hover:bg-slate-200 transition"
         onclick="toggleGroup(this)">
@@ -973,10 +1005,10 @@ return groupData.map((group, gIndex) => `
     </div>
 </div>
 `).join('');
-};
+            };
 
-// Generate HTML for the modal
-let html = `
+            // Generate HTML for the modal
+            let html = `
 <div class="space-y-6">
     <div class="bg-blue-50 p-4 rounded-lg border border-blue-100 text-sm text-blue-800 mb-4 shadow-sm">
         <p class="font-bold mb-1 flex items-center gap-1">
@@ -1035,56 +1067,56 @@ let html = `
 </div>
 `;
 
-content.innerHTML = html;
-modal.classList.remove('hidden');
-}
+            content.innerHTML = html;
+            modal.classList.remove('hidden');
+        }
 
-// Toggle visibility of check items
-function toggleGroup(header) {
-const content = header.nextElementSibling;
-const icon = header.querySelector('svg');
-content.classList.toggle('hidden');
-if (content.classList.contains('hidden')) {
-icon.style.transform = 'rotate(0deg)';
-header.classList.remove('bg-slate-200');
-header.classList.add('bg-slate-100');
-} else {
-icon.style.transform = 'rotate(180deg)';
-header.classList.remove('bg-slate-100');
-header.classList.add('bg-slate-200');
-}
-}
+        // Toggle visibility of check items
+        function toggleGroup(header) {
+            const content = header.nextElementSibling;
+            const icon = header.querySelector('svg');
+            content.classList.toggle('hidden');
+            if (content.classList.contains('hidden')) {
+                icon.style.transform = 'rotate(0deg)';
+                header.classList.remove('bg-slate-200');
+                header.classList.add('bg-slate-100');
+            } else {
+                icon.style.transform = 'rotate(180deg)';
+                header.classList.remove('bg-slate-100');
+                header.classList.add('bg-slate-200');
+            }
+        }
 
-function confirmReferenceSelection() {
-const checkboxes = document.querySelectorAll('input[type="checkbox"][name*="-"]:checked');
-const selectedTexts = Array.from(checkboxes).map(cb => cb.value);
+        function confirmReferenceSelection() {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"][name*="-"]:checked');
+            const selectedTexts = Array.from(checkboxes).map(cb => cb.value);
 
-if (selectedTexts.length > 0) {
-const textarea = document.querySelector('textarea[name="specialConsiderations"]');
-const currentContent = textarea.value.trim();
+            if (selectedTexts.length > 0) {
+                const textarea = document.querySelector('textarea[name="specialConsiderations"]');
+                const currentContent = textarea.value.trim();
 
-// Add bullet points
-const formattedTexts = selectedTexts.map(text => "• " + text);
+                // Add bullet points
+                const formattedTexts = selectedTexts.map(text => "• " + text);
 
-if (currentContent === "") {
-textarea.value = formattedTexts.join('\n');
-} else {
-textarea.value += '\n' + formattedTexts.join('\n');
-}
+                if (currentContent === "") {
+                    textarea.value = formattedTexts.join('\n');
+                } else {
+                    textarea.value += '\n' + formattedTexts.join('\n');
+                }
 
-const btn = document.querySelector('button[onclick="confirmReferenceSelection()"]');
-btn.innerText = "已帶入！";
-btn.classList.remove('bg-slate-800', 'hover:bg-slate-900');
-btn.classList.add('bg-green-600', 'hover:bg-green-700');
+                const btn = document.querySelector('button[onclick="confirmReferenceSelection()"]');
+                btn.innerText = "已帶入！";
+                btn.classList.remove('bg-slate-800', 'hover:bg-slate-900');
+                btn.classList.add('bg-green-600', 'hover:bg-green-700');
 
-setTimeout(() => {
-closeModal();
-document.getElementById('sec-special').scrollIntoView({ behavior: 'smooth' });
-}, 500);
-} else {
-closeModal();
-}
-}
+                setTimeout(() => {
+                    closeModal();
+                    document.getElementById('sec-special').scrollIntoView({ behavior: 'smooth' });
+                }, 500);
+            } else {
+                closeModal();
+            }
+        }
         // --- Frontend Utility Functions ---
 
         document.getElementById('main-scroll').addEventListener('scroll', function () {
@@ -1250,25 +1282,40 @@ closeModal();
             }
 
             resultsDiv.innerHTML = data.map((item) => `
-                <div onclick='showDetail(${JSON.stringify(item).replace(/'/g, "&#39;")})' class="bg-white p-4 rounded-xl border border-slate-200 hover:border-primary-400 cursor-pointer transition-all shadow-sm hover:shadow-md group">
-                    <div class="flex justify-between items-start">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full bg-primary-100 text-primary-600 flex items-center justify-center font-bold">
-                                ${item.name.charAt(0)}
+                <div onclick='showDetail(${JSON.stringify(item).replace(/'/g, "&#39;")})' class="bg-white p-5 rounded-xl border border-slate-200 hover:border-primary-400 cursor-pointer transition-all shadow-sm hover:shadow-md group relative">
+                    
+                    <div class="absolute top-4 right-4 flex flex-col items-end gap-2 z-10">
+                        <div class="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-lg text-sm font-bold border border-indigo-100 truncate max-w-[120px]">
+                            ${item.hospitalBranch || '未指定'}
+                        </div>
+                        <div class="text-slate-400 hover:text-primary-600 p-1 rounded hover:bg-primary-50 transition"
+                            onclick='event.stopPropagation(); printAssessment(${JSON.stringify(item).replace(/'/g, "&#39;")})'>
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col gap-3 pr-24">
+                        <div class="flex items-baseline gap-2">
+                             <h3 class="font-bold text-slate-800 text-lg leading-tight">${item.name}</h3>
+                             <span class="text-slate-600 text-sm">(${item.gender === 'Male' ? '男' : '女'}, ${item.age}歲)</span>
+                        </div>
+
+                        <div class="flex flex-col gap-1 text-sm text-slate-600">
+                             <div class="flex items-center gap-2">
+                                <span class="text-slate-400">病歷號:</span>
+                                <span class="font-mono bg-slate-100 px-2 py-0.5 rounded text-slate-700">${item.chartNo}</span>
                             </div>
-                            <div>
-                                <h3 class="font-bold text-slate-800">${item.name}</h3>
-                                <p class="text-xs text-slate-500 font-mono">#${item.chartNo}</p>
+                            <div class="flex items-center gap-2">
+                                <span class="text-slate-400">評估日期:</span>
+                                <span class="font-mono font-medium text-slate-800">${item.date}</span>
+                            </div>
+                             <div class="flex items-center gap-2">
+                                <span class="text-slate-400">生日:</span>
+                                <span class="font-mono text-slate-600">${item.dob}</span>
                             </div>
                         </div>
-                        <span class="text-xs font-medium bg-slate-100 text-slate-600 px-2 py-1 rounded">${item.date}</span>
-                    </div>
-                    <div class="mt-3 flex justify-between items-center">
-                        <span class="text-xs text-slate-500">風險等級: <b class="${item.riskLevel === 'High' ? 'text-red-600' : (item.riskLevel === 'Medium' ? 'text-orange-600' : 'text-green-600')}">${item.riskLevel || '--'}</b></span>
-                        <button onclick='event.stopPropagation(); printAssessment(${JSON.stringify(item).replace(/'/g, "&#39;")})' 
-                            class="text-slate-400 hover:text-primary-600 p-1 rounded hover:bg-primary-50 transition">
-                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
-                        </button>
                     </div>
                 </div>
             `).join('');
@@ -1287,7 +1334,7 @@ closeModal();
             const genderMap = { 'Male': '男', 'Female': '女' };
             const riskMap = { 'High': '高風險', 'Medium': '中風險', 'Low': '低風險' };
             const exerciseMap = { 'Yes': '有', 'No': '無' };
-            const metaMap = item.metastasis === 'Yes' ? `有 (${item.metastasisDesc || ''})` : '無';
+            const metaMap = item.metastasis === 'Yes' ? `有(${item.metastasisDesc || ''})` : '無';
 
             // Intensity mapping
             let intensityText = item.intensityRec;
@@ -1303,14 +1350,19 @@ closeModal();
                         <span class="font-bold text-slate-700">1. 基本資料</span>
                         <span class="text-xs bg-white px-2 py-1 rounded border">${item.date}</span>
                     </div>
-                    ${field('姓名', item.name)} ${field('病歷號', item.chartNo)}
-                    ${field('出生日期', item.dob)} ${field('性別', genderMap[item.gender] || item.gender)}
-                    ${field('年齡', item.age)}
-                    
+                    <div class="col-span-2 grid grid-cols-2 gap-4">
+                        ${field('評估日期', item.date)}
+                        ${field('院區', item.hospitalBranch)}
+                        ${field('病歷號', item.chartNo)}
+                        ${field('姓名', item.name)}
+                        ${field('出生日期', item.dob)}
+                        ${field('年齡', item.age)}
+                        ${field('性別', item.gender === 'Male' ? '男' : '女')}
+                    </div>
                     <div class="col-span-2 bg-slate-100 p-3 rounded-lg font-bold text-slate-700 mt-4">2. 運動測試</div>
                     ${field('Resting HR', item.restingHR + ' bpm')} ${field('Max HR', item.maxHR + ' bpm')}
                     ${field('VO2max (METs)', item.vo2maxMets)} ${field('6MWT', item.sixMWT + ' 公尺')}
-                    
+
                     <div class="col-span-2 bg-slate-100 p-3 rounded-lg font-bold text-slate-700 mt-4">3. 功能性評估</div>
                     ${field('握力', item.gripStrength + ' kg')} ${field('手臂彎舉', item.bicepCurl + ' 下')}
                     ${field('坐到站', item.sitToStand + ' 下')} ${field('單腳站立', item.oneLegStance + ' 秒')}
@@ -1352,265 +1404,276 @@ closeModal();
 
         function printAssessment(item) {
             const printWindow = window.open('', '_blank');
-            const v = (val) => val || '';
+            // Helper to handle line breaks
+            const v = (val) => String(val || '').replace(/\n/g, '<br>');
             const box = (val, target) => val === target ? '■' : '□';
 
-            // 恢復原始完整排版 HTML
             const html = `
                 <!DOCTYPE html>
                 <html lang="zh-TW">
-                <head>
-                    <meta charset="UTF-8">
-                    <title>列印評估紀錄 - ${v(item.name)}</title>
-                    <style>
-                        @page {
-                            size: A4 landscape;
-                            margin: 1cm;
-                        }
-                        body {
-                            font-family: "BiauKai", "DFKai-SB", "標楷體", serif;
-                            margin: 0;
-                            padding: 0;
-                            color: #000;
-                            font-size: 14px;
-                            line-height: 1.3;
-                        }
-                        .container {
-                            width: 100%;
-                            max-width: 277mm;
-                            margin: 0 auto;
-                        }
-                        h1 {
-                            text-align: center;
-                            font-size: 24px;
-                            font-weight: bold;
-                            margin-bottom: 20px;
-                        }
-                        .version {
-                            text-align: right;
-                            font-size: 12px;
-                            margin-bottom: 5px;
-                        }
-                        table {
-                            width: 100%;
-                            border-collapse: collapse;
-                            border: 1px solid #000;
-                        }
-                        td, th {
-                            border: 1px solid #000;
-                            padding: 5px 8px;
-                            vertical-align: top;
-                        }
-                        .section-title {
-                            font-weight: bold;
-                            font-size: 16px;
-                            margin-bottom: 5px;
-                        }
-                        .row {
-                            display: flex;
-                            align-items: center;
-                            margin-bottom: 3px;
-                        }
-                        .label {
-                            font-weight: bold;
-                            margin-right: 5px;
-                            white-space: nowrap;
-                        }
-                        .checkbox-group {
-                            display: inline-flex;
-                            gap: 15px;
-                        }
-                        .checkbox-item {
-                            display: inline-flex;
-                            align-items: center;
-                        }
-                        ul {
-                            margin: 0;
-                            padding-left: 20px;
-                        }
-                        li {
-                            margin-bottom: 3px;
-                        }
-                        
-                        /* 欄位寬度設定 */
-                        .col-basic { width: 25%; }
-                        .col-test { width: 30%; }
-                        .col-func { width: 25%; }
-                        .col-ultra { width: 20%; }
-                        
-                        .col-medical { width: 23%; }
-                        .col-cancer { width: 22%; }
-                        .col-risk { width: 28%; }
-                        .col-special { width: 27%; }
+                    <head>
+                        <meta charset="UTF-8">
+                            <title>列印評估紀錄 - ${v(item.name)}</title>
+                            <style>
+                                @page {
+                                    size: A4 landscape;
+                                    margin: 1cm;
+                                }
+                                body {
+                                    font-family: "BiauKai", "DFKai-SB", "標楷體", serif !important;
+                                    margin: 0;
+                                    padding: 0;
+                                    color: #000;
+                                    font-size: 14px;
+                                    line-height: 1.5;
+                                    display: flex;
+                                    justify-content: center;
+                                }
+                                * {
+                                    font-family: "BiauKai", "DFKai-SB", "標楷體", serif !important;
+                                }
+                                table, tr, td, th, div, span, p, label, b, strong, li {
+                                    font-family: "BiauKai", "DFKai-SB", "標楷體", serif !important;
+                                }
+                                .container {
+                                    width: 100%;
+                                    max-width: 277mm;
+                                    margin: 0 auto;
+                                }
+                                h1 {
+                                    text-align: center;
+                                    font-size: 24px;
+                                    font-weight: bold;
+                                    margin-bottom: 20px;
+                                }
+                                .version {
+                                    text-align: right;
+                                    font-size: 12px;
+                                    margin-bottom: 5px;
+                                }
+                                table {
+                                    width: 100%;
+                                    border-collapse: collapse;
+                                    border: 1px solid #000;
+                                }
+                                td, th {
+                                    border: 1px solid #000;
+                                    padding: 5px 8px;
+                                    vertical-align: top;
+                                }
+                                .section-title {
+                                    font-weight: bold;
+                                    font-size: 16px;
+                                    margin-bottom: 5px;
+                                }
+                                .row {
+                                    display: flex;
+                                    align-items: center;
+                                    margin-bottom: 3px;
+                                }
+                                .label {
+                                    font-weight: bold;
+                                    margin-right: 5px;
+                                    white-space: nowrap;
+                                }
+                                .checkbox-group {
+                                    display: inline-flex;
+                                    gap: 15px;
+                                }
+                                .checkbox-item {
+                                    display: inline-flex;
+                                    align-items: center;
+                                }
+                                ul {
+                                    margin: 0;
+                                    padding-left: 20px;
+                                }
+                                li {
+                                    margin-bottom: 3px;
+                                }
+                                
+                                /* 欄位寬度設定 */
+                                .col-basic { width: 25%; }
+                                .col-test { width: 30%; }
+                                .col-func { width: 25%; }
+                                .col-ultra { width: 20%; }
+                                
+                                .col-medical { width: 23%; }
+                                .col-cancer { width: 22%; }
+                                .col-risk { width: 28%; }
+                                .col-special { width: 27%; }
 
-                        .underline {
-                            text-decoration: underline;
-                            text-underline-offset: 3px;
-                        }
-                    </style>
-                </head>
-                <body>
-                    <div class="container">
-                        <div class="version">版本一</div>
-                        <h1>特殊族群運動訓練前評估紀錄表暨運動處方</h1>
-                        
-                        <table>
-                            <tr style="height: 150px;">
-                                <td class="col-basic">
-                                    <div class="row">
-                                        <span class="label">評估日期：</span>
-                                        <span>${v(item.date).replace(/-/g, ' / ')}</span>
-                                    </div>
-                                    <div class="row">
-                                        <span class="label">個案姓名：</span>
-                                        <span>${v(item.name)}</span>
-                                    </div>
-                                    <div class="row">
-                                        <span class="label">病歷號：</span>
-                                        <span>${v(item.chartNo)}</span>
-                                    </div>
-                                    <div class="row">
-                                        <span class="label">出生日期：</span>
-                                        <span>${v(item.dob).replace(/-/g, ' / ')}</span>
-                                    </div>
-                                    <div class="row">
-                                        <span class="label">性別：</span>
-                                        <div class="checkbox-group">
-                                            <span class="checkbox-item">${box(item.gender, 'Male')} 男</span>
-                                            <span class="checkbox-item">${box(item.gender, 'Female')} 女</span>
+                                .underline {
+                                    text-decoration: underline;
+                                    text-underline-offset: 3px;
+                                }
+                            </style>
+                    </head>
+                    <body>
+                        <div class="container">
+                            <h1>特殊族群運動訓練前評估紀錄表暨運動處方</h1>
+
+                            <table>
+                                <tr style="height: 150px;">
+                                    <td class="col-basic">
+                                        <div class="row">
+                                            <span class="label">院區：</span>
+                                            <span>${v(item.hospitalBranch)}</span>
                                         </div>
-                                    </div>
-                                </td>
-                                
-                                <td class="col-test">
-                                    <div class="section-title">運動測試結果：</div>
-                                    <ul>
-                                        <li>休息時心跳： <span class="underline">&nbsp;${v(item.restingHR)}&nbsp;</span> bpm</li>
-                                        <li>最大運動時心跳： <span class="underline">&nbsp;${v(item.maxHR)}&nbsp;</span> bpm</li>
-                                        <li>最大攝氧量： <span class="underline">&nbsp;${v(item.vo2maxMets)}&nbsp;</span> METs</li>
-                                        <li>六分鐘行走測試結果： <span class="underline">&nbsp;${v(item.sixMWT)}&nbsp;</span> 公尺</li>
-                                    </ul>
-                                </td>
-                                
-                                <td class="col-func">
-                                    <div class="section-title">功能性評估：</div>
-                                    <ul>
-                                        <li>慣用手握力： <span class="underline">&nbsp;${v(item.gripStrength)}&nbsp;</span> kg</li>
-                                        <li>30秒手臂彎舉測試： <span class="underline">&nbsp;${v(item.bicepCurl)}&nbsp;</span> 下</li>
-                                        <li>30秒坐到站測試： <span class="underline">&nbsp;${v(item.sitToStand)}&nbsp;</span> 下</li>
-                                        <li>單腳站立測試： <span class="underline">&nbsp;${v(item.oneLegStance)}&nbsp;</span> 秒</li>
-                                        <li>(癌症個案)疲勞量表： <span class="underline">&nbsp;${v(item.fatigueScale)}&nbsp;</span> 分</li>
-                                    </ul>
-                                </td>
-                                
-                                <td class="col-ultra">
-                                    <div class="section-title">肌肉骨骼超音波檢查：</div>
-                                    <ol>
-                                        <li>${v(item.ultrasound1)}</li>
-                                        <li>${v(item.ultrasound2)}</li>
-                                        <li>${v(item.ultrasound3)}</li>
-                                    </ol>
-                                </td>
-                            </tr>
-                            
-                            <tr style="height: 400px;">
-                                <td class="col-medical">
-                                    <div class="section-title">醫療史總結：</div>
-                                    <ul>
-                                        <li>
-                                            <span class="label">主要診斷：</span>
-                                            <div>${v(item.mainDiagnosis)}</div>
-                                        </li>
-                                        <br>
-                                        <li>
-                                            <span class="label">過去病史：</span>
-                                            <div>${v(item.pastHistory)}</div>
-                                        </li>
-                                        <br>
-                                        <li>
-                                            <span class="label">手術史：</span>
-                                            <div>${v(item.surgeryHistory)}</div>
-                                        </li>
-                                        <br>
-                                        <li>
-                                            <span class="label">藥物史：</span>
-                                            <div>${v(item.medicationHistory)}</div>
-                                        </li>
-                                        <br>
-                                        <li>
-                                            <span class="label">活動史：</span>
-                                            <span class="checkbox-item">${box(item.regularExercise, 'Yes')} 有</span>
-                                            <span class="checkbox-item">${box(item.regularExercise, 'No')} 無</span>
-                                            規律運動
-                                        </li>
-                                    </ul>
-                                </td>
-                                
-                                <td class="col-cancer">
-                                    <div class="section-title">癌症病史：</div>
-                                    <ul>
-                                        <li>癌症種類：${v(item.cancerType)}</li>
-                                        <li>癌症位置：${v(item.cancerLocation)}</li>
-                                        <li>是否有轉移：${item.metastasis === 'Yes' ? '是' : '否'} <br> ${v(item.metastasisDesc)}</li>
-                                        <br>
-                                        <li>治療狀態：${v(item.treatmentStatus)}</li>
-                                        <br>
-                                        <li>已接受之治療：${v(item.treatmentsReceived)}</li>
-                                        <br>
-                                        <li>治療相關之副作用：${v(item.treatmentSideEffects)}</li>
-                                    </ul>
-                                </td>
-                                
-                                <td class="col-risk">
-                                    <div class="section-title">運動風險：</div>
-                                    <div style="margin-bottom: 20px;">
-                                        <div class="checkbox-item" style="display:block; margin-bottom:5px;">
-                                            ${box(item.riskLevel, 'High')} 高風險：需醫師評估後方能運動
+                                        <div class="row">
+                                            <span class="label">評估日期：</span>
+                                            <span>${v(item.date).replace(/-/g, ' / ')}</span>
                                         </div>
-                                        <div class="checkbox-item" style="display:block; margin-bottom:5px;">
-                                            ${box(item.riskLevel, 'Medium')} 中風險：可在專家監督下運動
+                                        <div class="row">
+                                            <span class="label">個案姓名：</span>
+                                            <span>${v(item.name)}</span>
                                         </div>
-                                        <div class="checkbox-item" style="display:block; margin-bottom:5px;">
-                                            ${box(item.riskLevel, 'Low')} 低風險：不用受監督，可自行運動
+                                        <div class="row">
+                                            <span class="label">病歷號：</span>
+                                            <span>${v(item.chartNo)}</span>
                                         </div>
-                                    </div>
-                                    
-                                    <div class="section-title">運動強度：</div>
-                                    <div>
-                                        <div class="checkbox-item" style="display:block; margin-bottom:5px;">
-                                            ${box(item.intensityRec, 'NotRecommended')} 暫時不建議運動
+                                        <div class="row">
+                                            <span class="label">出生日期：</span>
+                                            <span>${v(item.dob).replace(/-/g, ' / ')}</span>
                                         </div>
-                                        <div class="checkbox-item" style="display:block; margin-bottom:5px;">
-                                            ${box(item.intensityRec, 'LowToMedium')} 初始低強度運動，可循序漸進至中等強度運動
+                                        <div class="row">
+                                            <span class="label">性別：</span>
+                                            <div class="checkbox-group">
+                                                <span class="checkbox-item">${box(item.gender, 'Male')} 男</span>
+                                                <span class="checkbox-item">${box(item.gender, 'Female')} 女</span>
+                                            </div>
                                         </div>
-                                        <div class="checkbox-item" style="display:block; margin-bottom:5px;">
-                                            ${box(item.intensityRec, 'LowMediumToHigh')} 初始低至中等強度運動，可循序漸進至高強度運動
+                                    </td>
+
+                                    <td class="col-test">
+                                        <div class="section-title">運動測試結果：</div>
+                                        <ul>
+                                            <li>休息時心跳： <span class="underline">&nbsp;${v(item.restingHR)}&nbsp;</span> bpm</li>
+                                            <li>最大運動時心跳： <span class="underline">&nbsp;${v(item.maxHR)}&nbsp;</span> bpm</li>
+                                            <li>最大攝氧量： <span class="underline">&nbsp;${v(item.vo2maxMets)}&nbsp;</span> METs</li>
+                                            <li>六分鐘行走測試結果： <span class="underline">&nbsp;${v(item.sixMWT)}&nbsp;</span> 公尺</li>
+                                        </ul>
+                                    </td>
+
+                                    <td class="col-func">
+                                        <div class="section-title">功能性評估：</div>
+                                        <ul>
+                                            <li>慣用手握力： <span class="underline">&nbsp;${v(item.gripStrength)}&nbsp;</span> kg</li>
+                                            <li>30秒手臂彎舉測試： <span class="underline">&nbsp;${v(item.bicepCurl)}&nbsp;</span> 下</li>
+                                            <li>30秒坐到站測試： <span class="underline">&nbsp;${v(item.sitToStand)}&nbsp;</span> 下</li>
+                                            <li>單腳站立測試： <span class="underline">&nbsp;${v(item.oneLegStance)}&nbsp;</span> 秒</li>
+                                            <li>(癌症個案)疲勞量表： <span class="underline">&nbsp;${v(item.fatigueScale)}&nbsp;</span> 分</li>
+                                        </ul>
+                                    </td>
+
+                                    <td class="col-ultra">
+                                        <div class="section-title">肌肉骨骼超音波檢查：</div>
+                                        <div style="padding-left: 0;">
+                                            <div>1. ${v(item.ultrasound1)}</div>
+                                            <div>2. ${v(item.ultrasound2)}</div>
+                                            <div>3. ${v(item.ultrasound3)}</div>
                                         </div>
-                                        <div class="checkbox-item" style="display:block; margin-bottom:5px;">
-                                            ${box(item.intensityRec, 'MediumNoHigh')} 初始中等強度運動，暫不建議從事高強度運動
-                                        </div>
-                                        <div class="checkbox-item" style="display:block; margin-bottom:5px;">
-                                            ${box(item.intensityRec, 'MediumToHigh')} 初始中等強度運動，可循序漸進至高強度運動
-                                        </div>
-                                    </div>
-                                </td>
-                                
-                                <td class="col-special">
-                                    <div class="section-title">運動特殊考量：</div>
-                                    <div style="white-space: pre-wrap;">${v(item.specialConsiderations)}</div>
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-                    <script>
-                        window.onload = function() {
-                            setTimeout(function() {
-                                window.print();
-                            }, 500);
+                                    </td>
+                                </tr>
+
+                                <tr style="height: 400px;">
+                                    <td class="col-medical">
+                                        <div class="section-title">醫療史總結：</div>
+                                        <ul>
+                                            <li>
+                                                <span class="label">主要診斷：</span>
+                                                <div>${v(item.mainDiagnosis)}</div>
+                                            </li>
+                                            <br>
+                                                <li>
+                                                    <span class="label">過去病史：</span>
+                                                    <div>${v(item.pastHistory)}</div>
+                                                </li>
+                                                <br>
+                                                    <li>
+                                                        <span class="label">手術史：</span>
+                                                        <div>${v(item.surgeryHistory)}</div>
+                                                    </li>
+                                                    <br>
+                                                        <li>
+                                                            <span class="label">藥物史：</span>
+                                                            <div>${v(item.medicationHistory)}</div>
+                                                        </li>
+                                                        <br>
+                                                            <li>
+                                                                <span class="label">活動史：</span>
+                                                                <span class="checkbox-item">${box(item.regularExercise, 'Yes')} 有</span>
+                                                                <span class="checkbox-item">${box(item.regularExercise, 'No')} 無</span>
+                                                                規律運動
+                                                            </li>
+                                                        </ul>
+                                                    </td>
+
+                                                    <td class="col-cancer">
+                                                        <div class="section-title">癌症病史：</div>
+                                                        <ul>
+                                                            <li>癌症種類：${v(item.cancerType)}</li>
+                                                            <li>癌症位置：${v(item.cancerLocation)}</li>
+                                                            <li>是否有轉移：${item.metastasis === 'Yes' ? '是' : '否'} <br> ${v(item.metastasisDesc)}</li>
+                                                            <br>
+                                                                <li>治療狀態：<br>${v(item.treatmentStatus)}</li>
+                                                                <br>
+                                                                    <li>已接受之治療：<br>${v(item.treatmentsReceived)}</li>
+                                                                    <br>
+                                                                        <li>治療相關之副作用：<br>${v(item.treatmentSideEffects)}</li>
+                                                                    </ul>
+                                                                </td>
+
+                                                                <td class="col-risk">
+                                                                    <div class="section-title">運動風險：</div>
+                                                                    <div style="margin-bottom: 20px;">
+                                                                        <div class="checkbox-item" style="display:block; margin-bottom:5px;">
+                                                                            ${box(item.riskLevel, 'High')} 高風險：需醫師評估後方能運動
+                                                                        </div>
+                                                                        <div class="checkbox-item" style="display:block; margin-bottom:5px;">
+                                                                            ${box(item.riskLevel, 'Medium')} 中風險：可在專家監督下運動
+                                                                        </div>
+                                                                        <div class="checkbox-item" style="display:block; margin-bottom:5px;">
+                                                                            ${box(item.riskLevel, 'Low')} 低風險：不用受監督，可自行運動
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="section-title">運動強度：</div>
+                                                                    <div>
+                                                                        <div class="checkbox-item" style="display:block; margin-bottom:5px;">
+                                                                            ${box(item.intensityRec, 'NotRecommended')} 暫時不建議運動
+                                                                        </div>
+                                                                        <div class="checkbox-item" style="display:block; margin-bottom:5px;">
+                                                                            ${box(item.intensityRec, 'LowToMedium')} 初始低強度運動，可循序漸進至中等強度運動
+                                                                        </div>
+                                                                        <div class="checkbox-item" style="display:block; margin-bottom:5px;">
+                                                                            ${box(item.intensityRec, 'LowMediumToHigh')} 初始低至中等強度運動，可循序漸進至高強度運動
+                                                                        </div>
+                                                                        <div class="checkbox-item" style="display:block; margin-bottom:5px;">
+                                                                            ${box(item.intensityRec, 'MediumNoHigh')} 初始中等強度運動，暫不建議從事高強度運動
+                                                                        </div>
+                                                                        <div class="checkbox-item" style="display:block; margin-bottom:5px;">
+                                                                            ${box(item.intensityRec, 'MediumToHigh')} 初始中等強度運動，可循序漸進至高強度運動
+                                                                        </div>
+                                                                    </div>
+                                                                </td>
+
+                                                                <td class="col-special">
+                                                                    <div class="section-title">運動特殊考量：</div>
+                                                                    <div style="white-space: pre-wrap;">${v(item.specialConsiderations)}</div>
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                    </div>
+                                                    <script>
+                                                        window.onload = function() {
+                                                            setTimeout(function () {
+                                                                window.print();
+                                                            }, 500);
                         };
-                    <\/script>
-                </body>
-                </html>
+                                                        <\/script>
+                                                    </body>
+                                                </html>
             `;
 
             printWindow.document.write(html);
