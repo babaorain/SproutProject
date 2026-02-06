@@ -333,13 +333,13 @@
                                     class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">VO2max
                                     (METs)</label>
                                 <input type="number" name="vo2maxMets" class="form-input font-mono text-lg"
-                                    placeholder="0.0" step="0.1" />
+                                    placeholder="0.00" step="0.01" />
                             </div>
                             <div class="relative">
                                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">6 MWT
                                     (公尺)</label>
                                 <input type="number" name="sixMWT" class="form-input font-mono text-lg"
-                                    placeholder="0" />
+                                    placeholder="0.0" step="0.1" />
                             </div>
                             <div class="hidden">
                                 <input type="number" name="vo2maxMl">
@@ -385,7 +385,7 @@
                                     <label class="block text-xs text-slate-500 mb-1">單腳站立 (秒)</label>
                                     <input type="number" name="oneLegStance"
                                         class="w-full bg-white border border-slate-300 rounded p-2 focus:border-primary-500 outline-none text-center font-mono text-xl"
-                                        placeholder="-" />
+                                        placeholder="-" step="0.1" />
                                 </div>
                             </div>
 
@@ -790,7 +790,15 @@
         </main>
     </div>
 
-    <div id="fab-container" class="fixed bottom-6 right-6 z-40 transition-transform duration-300">
+    <div id="fab-container" class="fixed bottom-6 right-6 z-40 transition-transform duration-300 flex gap-2">
+        <button onclick="cancelEdit()" id="cancelEditBtn"
+            class="hidden bg-slate-500 text-white shadow-lg hover:shadow-xl hover:bg-slate-600 rounded-full px-4 py-4 flex items-center gap-2 font-bold transition-all active:scale-95">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            <span>取消編輯</span>
+        </button>
         <button onclick="submitData()" id="submitBtn"
             class="bg-slate-800 text-white shadow-lg hover:shadow-xl hover:bg-slate-900 rounded-full px-6 py-4 flex items-center gap-2 font-bold transition-all active:scale-95">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
@@ -823,6 +831,9 @@
     <script>
         // 設定你的 Google Apps Script URL
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzLgAWo7MxH-BO9mnP8soIJtFkH7iLDIPPFMfzGM_zVPK6moTvFramsu4e_NHhMDYJp/exec';
+
+        // 追蹤是否正在編輯現有記錄
+        let editingRowId = null;
 
         // --- Reference Data (請在此處填入 PDF 中的內容) ---
         const SpecialConsiderationsData = {
@@ -1222,7 +1233,13 @@
                 const fd = new FormData(form);
                 const params = new URLSearchParams();
                 for (const [k, v] of fd.entries()) params.append(k, v);
-                params.append('action', 'submit');
+                // 判斷是新增還是更新
+                if (editingRowId) {
+                    params.append('action', 'update');
+                    params.append('rowId', editingRowId);
+                } else {
+                    params.append('action', 'submit');
+                }
 
                 let data;
                 try {
@@ -1233,7 +1250,13 @@
                 }
 
                 if (data && data.result === 'success') {
-                    await Swal.fire({ icon: 'success', title: '提交成功!', confirmButtonColor: '#0ea5e9' });
+                    const successMsg = editingRowId ? '更新成功!' : '提交成功!';
+                    await Swal.fire({ icon: 'success', title: successMsg, confirmButtonColor: '#0ea5e9' });
+
+                    // 重置編輯狀態
+                    editingRowId = null;
+                    updateSubmitButton();
+
                     form.reset();
                     document.getElementById('date').valueAsDate = new Date();
                     document.getElementById('fatigueValue').innerText = '0';
@@ -1288,11 +1311,19 @@
                         <div class="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-lg text-sm font-bold border border-indigo-100 truncate max-w-[120px]">
                             ${item.hospitalBranch || '未指定'}
                         </div>
-                        <div class="text-slate-400 hover:text-primary-600 p-1 rounded hover:bg-primary-50 transition"
-                            onclick='event.stopPropagation(); printAssessment(${JSON.stringify(item).replace(/'/g, "&#39;")})'>
-                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                            </svg>
+                        <div class="flex gap-1">
+                            <div class="text-slate-400 hover:text-green-600 p-1 rounded hover:bg-green-50 transition" title="編輯"
+                                onclick='event.stopPropagation(); editPatient(${JSON.stringify(item).replace(/'/g, "&#39;")})'>
+                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                            </div>
+                            <div class="text-slate-400 hover:text-primary-600 p-1 rounded hover:bg-primary-50 transition" title="列印"
+                                onclick='event.stopPropagation(); printAssessment(${JSON.stringify(item).replace(/'/g, "&#39;")})'>
+                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                                </svg>
+                            </div>
                         </div>
                     </div>
 
@@ -1400,6 +1431,180 @@
 
         function closeModal() {
             document.getElementById('detailModal').classList.add('hidden');
+        }
+
+        // 編輯病人資料 - 將資料帶回表單
+        function editPatient(item) {
+            // 設定編輯狀態
+            editingRowId = item.rowId;
+
+            // 切換到表單頁籤
+            switchTab('form');
+
+            // 填入表單資料
+            const form = document.getElementById('assessmentForm');
+
+            // 基本資料
+            form.querySelector('[name="date"]').value = item.date || '';
+            form.querySelector('[name="hospitalBranch"]').value = item.hospitalBranch || '高醫本院';
+            form.querySelector('[name="chartNo"]').value = item.chartNo || '';
+            form.querySelector('[name="name"]').value = item.name || '';
+            form.querySelector('[name="dob"]').value = item.dob || '';
+            document.getElementById('age').value = item.age || '';
+
+            // 性別 - Radio button
+            const genderRadio = form.querySelector(`[name="gender"][value="${item.gender}"]`);
+            if (genderRadio) genderRadio.checked = true;
+
+            // 運動測試
+            form.querySelector('[name="restingHR"]').value = item.restingHR || '';
+            form.querySelector('[name="maxHR"]').value = item.maxHR || '';
+            form.querySelector('[name="vo2maxMets"]').value = item.vo2maxMets || '';
+            form.querySelector('[name="sixMWT"]').value = item.sixMWT || '';
+
+            // 功能性評估
+            form.querySelector('[name="gripStrength"]').value = item.gripStrength || '';
+            form.querySelector('[name="bicepCurl"]').value = item.bicepCurl || '';
+            form.querySelector('[name="sitToStand"]').value = item.sitToStand || '';
+            form.querySelector('[name="oneLegStance"]').value = item.oneLegStance || '';
+
+            // 疲勞量表
+            const fatigueScale = form.querySelector('[name="fatigueScale"]');
+            fatigueScale.value = item.fatigueScale || 0;
+            document.getElementById('fatigueValue').innerText = item.fatigueScale || 0;
+            fatigueScale.style.background = `linear-gradient(to right, #fb923c 0%, #fb923c ${(item.fatigueScale || 0) * 10}%, #e5e7eb ${(item.fatigueScale || 0) * 10}%, #e5e7eb 100%)`;
+
+            // 超音波
+            form.querySelector('[name="ultrasound1"]').value = item.ultrasound1 || '';
+            form.querySelector('[name="ultrasound2"]').value = item.ultrasound2 || '';
+            form.querySelector('[name="ultrasound3"]').value = item.ultrasound3 || '';
+
+            // 醫療史
+            form.querySelector('[name="mainDiagnosis"]').value = item.mainDiagnosis || '';
+            form.querySelector('[name="pastHistory"]').value = item.pastHistory || '';
+            form.querySelector('[name="surgeryHistory"]').value = item.surgeryHistory || '';
+            form.querySelector('[name="medicationHistory"]').value = item.medicationHistory || '';
+
+            // 規律運動 - Radio button
+            const exerciseRadio = form.querySelector(`[name="regularExercise"][value="${item.regularExercise}"]`);
+            if (exerciseRadio) exerciseRadio.checked = true;
+
+            // 癌症病史
+            form.querySelector('[name="cancerType"]').value = item.cancerType || '';
+            form.querySelector('[name="cancerLocation"]').value = item.cancerLocation || '';
+
+            // 轉移
+            const metaRadio = form.querySelector(`[name="metastasis"][value="${item.metastasis || 'No'}"]`);
+            if (metaRadio) {
+                metaRadio.checked = true;
+                if (item.metastasis === 'Yes') {
+                    document.getElementById('meta-desc').classList.remove('hidden');
+                    form.querySelector('[name="metastasisDesc"]').value = item.metastasisDesc || '';
+                } else {
+                    document.getElementById('meta-desc').classList.add('hidden');
+                }
+            }
+
+            form.querySelector('[name="treatmentStatus"]').value = item.treatmentStatus || '';
+            form.querySelector('[name="treatmentsReceived"]').value = item.treatmentsReceived || '';
+            form.querySelector('[name="treatmentSideEffects"]').value = item.treatmentSideEffects || '';
+
+            // 風險分級 - Radio button
+            const riskRadio = form.querySelector(`[name="riskLevel"][value="${item.riskLevel}"]`);
+            if (riskRadio) riskRadio.checked = true;
+
+            // 強度建議 - Radio button  
+            const intensityRadio = form.querySelector(`[name="intensityRec"][value="${item.intensityRec}"]`);
+            if (intensityRadio) intensityRadio.checked = true;
+
+            // 特殊考量
+            form.querySelector('[name="specialConsiderations"]').value = item.specialConsiderations || '';
+
+            // 更新按鈕顯示
+            updateSubmitButton();
+
+            // 捲動到頂部
+            document.getElementById('main-scroll').scrollTo(0, 0);
+
+            // 顯示提示
+            Swal.fire({
+                icon: 'info',
+                title: '已載入病人資料',
+                text: `正在編輯 ${item.name} 的評估紀錄`,
+                confirmButtonColor: '#0ea5e9',
+                timer: 2000,
+                timerProgressBar: true
+            });
+        }
+
+        // 更新提交按鈕外觀
+        function updateSubmitButton() {
+            const submitBtn = document.getElementById('submitBtn');
+            const cancelBtn = document.getElementById('cancelEditBtn');
+
+            if (editingRowId) {
+                // 顯示取消按鈕
+                cancelBtn.classList.remove('hidden');
+                cancelBtn.classList.add('flex');
+
+                // 更新提交按鈕為更新模式
+                submitBtn.classList.remove('bg-slate-800', 'hover:bg-slate-900');
+                submitBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+                submitBtn.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    <span>更新紀錄</span>
+                `;
+            } else {
+                // 隱藏取消按鈕
+                cancelBtn.classList.add('hidden');
+                cancelBtn.classList.remove('flex');
+
+                // 更新提交按鈕為新增模式
+                submitBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                submitBtn.classList.add('bg-slate-800', 'hover:bg-slate-900');
+                submitBtn.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                    </svg>
+                    <span>提交紀錄</span>
+                `;
+            }
+        }
+
+        // 取消編輯
+        function cancelEdit() {
+            Swal.fire({
+                title: '確定取消編輯？',
+                text: '所有未儲存的修改將會遺失',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: '確定取消',
+                cancelButtonText: '繼續編輯'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // 重置編輯狀態
+                    editingRowId = null;
+                    updateSubmitButton();
+
+                    // 重置表單
+                    document.getElementById('assessmentForm').reset();
+                    document.getElementById('date').valueAsDate = new Date();
+                    document.getElementById('fatigueValue').innerText = '0';
+                    document.getElementById('meta-desc').classList.add('hidden');
+                    document.getElementById('main-scroll').scrollTo(0, 0);
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: '已取消編輯',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                }
+            });
         }
 
         function printAssessment(item) {
