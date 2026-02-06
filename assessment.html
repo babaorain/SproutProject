@@ -326,14 +326,14 @@
                                         class="rounded text-primary-600 focus:ring-primary-500">
                                     <span class="whitespace-nowrap">關節炎:</span>
                                     <input type="text" name="historyMuscle" data-prefix="Arthritis:"
-                                        class="form-input h-8 text-sm py-1 flex-1" placeholder="部位/類型">
+                                        class="form-input h-8 py-1 flex-1" placeholder="部位/類型">
                                 </div>
                                 <div class="flex items-center gap-2">
                                     <input type="checkbox" name="historyMuscle" value="Pain"
                                         class="rounded text-primary-600 focus:ring-primary-500">
-                                    <span class="whitespace-nowrap text-sm">肌肉/關節/骨頭疼痛:</span>
+                                    <span class="whitespace-nowrap">肌肉/關節/骨頭疼痛:</span>
                                     <input type="text" name="historyMuscle" data-prefix="Pain:"
-                                        class="form-input h-8 text-sm py-1 flex-1" placeholder="部位">
+                                        class="form-input h-8 py-1 flex-1" placeholder="部位">
                                 </div>
                                 <label class="flex items-center"><input type="checkbox" name="historyMuscle"
                                         value="Osteoporosis"
@@ -346,7 +346,7 @@
                                         class="rounded text-primary-600 focus:ring-primary-500">
                                     <span class="whitespace-nowrap">關節置換:</span>
                                     <input type="text" name="historyMuscle" data-prefix="Replacement:"
-                                        class="form-input h-8 text-sm py-1 flex-1" placeholder="部位">
+                                        class="form-input h-8 py-1 flex-1" placeholder="部位">
                                 </div>
                             </div>
 
@@ -410,9 +410,9 @@
                                 <div class="flex items-center gap-2">
                                     <input type="checkbox" name="historyAutoimmune_flag" value="Autoimmune"
                                         class="rounded text-primary-600 focus:ring-primary-500">
-                                    <span class="whitespace-nowrap text-sm">自體免疫疾病:</span>
-                                    <input type="text" name="historyAutoimmune"
-                                        class="form-input h-8 text-sm py-1 flex-1" placeholder="疾病名稱">
+                                    <span class="whitespace-nowrap">自體免疫疾病:</span>
+                                    <input type="text" name="historyAutoimmune" class="form-input h-8 py-1 flex-1"
+                                        placeholder="疾病名稱">
                                 </div>
                             </div>
 
@@ -455,9 +455,9 @@
                                         <div class="flex items-center gap-2">
                                             <input type="checkbox" name="historyOtherPsych" value="OtherPsych"
                                                 class="rounded text-primary-600 focus:ring-primary-500">
-                                            <span class="whitespace-nowrap text-sm">其他精神疾病:</span>
+                                            <span class="whitespace-nowrap">其他精神疾病:</span>
                                             <input type="text" name="historyOtherPsychText" data-prefix="OtherPsych:"
-                                                class="form-input h-8 text-sm py-1 flex-1" placeholder="疾病名稱">
+                                                class="form-input h-8 py-1 flex-1" placeholder="疾病名稱">
                                         </div>
                                         <label class="flex items-center"><input type="checkbox" name="historyOtherSleep"
                                                 value="SleepApnea"
@@ -1898,6 +1898,7 @@
                                     <div class="checklist-item"><span class="bullet">神經:</span> <span>${translateMedical(item.historyNeuro)}</span></div>
                                     <div class="checklist-item"><span class="bullet">自體免疫:</span> <span>${v(item.historyAutoimmune) || '-'}</span></div>
                                     <div class="checklist-item"><span class="bullet">腸胃:</span> <span>${translateMedical(item.historyGastro)}</span></div>
+                                    <div class="checklist-item"><span class="bullet">其他:</span> <span>${[translateMedical(item.historyOtherPsych), translateMedical(item.historyOtherSleep)].filter(Boolean).join(', ') || '-'}</span></div>
                                 </div>
                             </div>
 
