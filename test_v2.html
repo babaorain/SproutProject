@@ -1,0 +1,1898 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>特殊族群運動訓練前評估系統</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=Inter:wght@400;600&display=swap"
+        rel="stylesheet" />
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Inter"', '"Noto Sans TC"', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: { 50: '#f0f9ff', 100: '#e0f2fe', 500: '#0ea5e9', 600: '#0284c7', 700: '#0369a1' },
+                        slate: { 850: '#1e293b' }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #f1f5f9;
+            -webkit-tap-highlight-color: transparent;
+            scroll-behavior: smooth;
+        }
+
+        /* 自定義滾動條 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* 統一的輸入框樣式 */
+        .form-input {
+            display: block;
+            width: 100%;
+            min-width: 0;
+            /* 關鍵修正：允許在 Flex/Grid 容器中縮小，防止手機版超出 */
+            height: 48px;
+            /* 關鍵修正：強制固定高度，解決 Date 與 Number 輸入框高度不一致導致的對齊問題 */
+            border-radius: 0.5rem;
+            border-width: 1px;
+            border-color: #cbd5e1;
+            background-color: #f8fafc;
+            padding: 0 0.75rem;
+            /* 上下 padding 由 height 控制，左右保持 */
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            color: #334155;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            box-sizing: border-box;
+            /* 確保 padding 不會增加寬度 */
+        }
+
+        .form-input:focus {
+            background-color: #ffffff;
+            border-color: #0ea5e9;
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
+            outline: none;
+            z-index: 10;
+        }
+
+        /* 針對 Textarea 覆寫高度限制 */
+        textarea.form-input {
+            height: auto;
+            padding: 0.75rem;
+        }
+
+        /* 卡片式 Radio 優化 */
+        .card-radio:checked+div {
+            border-color: #0284c7;
+            background-color: #f0f9ff;
+            box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.2);
+        }
+
+        .card-radio:checked+div .check-icon {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* 區塊收折動畫 */
+        details>summary {
+            list-style: none;
+        }
+
+        details>summary::-webkit-details-marker {
+            display: none;
+        }
+
+        details[open] summary~* {
+            animation: sweep .3s ease-in-out;
+        }
+
+        @keyframes sweep {
+            0% {
+                opacity: 0;
+                transform: translateY(-10px)
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        /* 側邊導航激活狀態 */
+        .nav-link.active {
+            color: #0284c7;
+            background-color: #e0f2fe;
+            border-right: 3px solid #0284c7;
+        }
+
+        /* 快選標籤 */
+        .chip {
+            transition: all 0.2s;
+        }
+
+        .chip:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+
+<body class="text-slate-700 h-screen flex flex-col overflow-hidden">
+
+    <header
+        class="bg-white border-b border-slate-200 h-16 flex-none z-30 shadow-sm flex items-center justify-between px-4 lg:px-8">
+        <div class="flex items-center gap-3">
+            <a href="index.html" class="bg-slate-100 hover:bg-slate-200 text-slate-600 p-2 rounded-lg transition-colors"
+                title="回首頁">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+            </a>
+            <div class="bg-primary-600 text-white p-2 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                </svg>
+            </div>
+            <h1 class="text-lg font-bold text-slate-800 tracking-tight hidden md:block">特殊族群運動訓練前評估</h1>
+            <h1 class="text-lg font-bold text-slate-800 tracking-tight md:hidden">運動評估系統</h1>
+        </div>
+
+        <div class="bg-slate-100 p-1 rounded-lg flex text-sm font-medium">
+            <button onclick="switchTab('form')" id="tab-form"
+                class="px-4 py-1.5 rounded-md transition-all shadow-sm bg-white text-primary-700">新增評估</button>
+            <button onclick="switchTab('search')" id="tab-search"
+                class="px-4 py-1.5 rounded-md transition-all text-slate-500 hover:text-slate-700">查詢紀錄</button>
+        </div>
+    </header>
+
+    <div class="flex flex-1 overflow-hidden relative">
+
+        <nav class="hidden lg:block w-64 bg-white border-r border-slate-200 overflow-y-auto flex-none py-6">
+            <div class="px-4 mb-2 text-xs font-bold text-slate-400 uppercase tracking-wider">評估流程</div>
+            <ul class="space-y-1" id="desktop-nav">
+                <li><a href="#sec-basic"
+                        class="nav-link block px-4 py-3 text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors active">1.
+                        基本資料</a></li>
+                <li><a href="#sec-test"
+                        class="nav-link block px-4 py-3 text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors">2.
+                        運動測試</a></li>
+                <li><a href="#sec-func"
+                        class="nav-link block px-4 py-3 text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors">3.
+                        功能性評估</a></li>
+                <li><a href="#sec-ultra"
+                        class="nav-link block px-4 py-3 text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors">4.
+                        超音波檢查</a></li>
+                <li><a href="#sec-history"
+                        class="nav-link block px-4 py-3 text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors">5.
+                        醫療史總結</a></li>
+                <li><a href="#sec-cancer"
+                        class="nav-link block px-4 py-3 text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors">6.
+                        癌症病史</a></li>
+                <li><a href="#sec-risk"
+                        class="nav-link block px-4 py-3 text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors">7.
+                        風險與強度</a></li>
+                <li><a href="#sec-special"
+                        class="nav-link block px-4 py-3 text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors">8.
+                        特殊考量</a></li>
+            </ul>
+        </nav>
+
+        <main class="flex-1 overflow-y-auto bg-slate-50 relative scroll-smooth" id="main-scroll">
+
+            <div id="view-form" class="max-w-4xl mx-auto p-4 pb-24 lg:p-8">
+                <form id="assessmentForm" onsubmit="event.preventDefault(); submitData();" class="space-y-6">
+
+                    <div id="sec-basic"
+                        class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden group">
+                        <div class="bg-slate-50 px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                            <h2 class="font-bold text-slate-800 text-lg flex items-center">
+                                <span
+                                    class="bg-primary-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs mr-3">1</span>
+                                基本資料
+                            </h2>
+                        </div>
+                        <div class="p-4 md:p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="w-full">
+                                <label class="block text-sm font-semibold text-slate-700 mb-1">評估日期</label>
+                                <input type="date" id="date" name="date" class="form-input" required />
+                            </div>
+
+                            <div class="w-full">
+                                <label class="block text-sm font-semibold text-slate-700 mb-1">院區</label>
+                                <select name="hospitalBranch" class="form-input">
+                                    <option value="高醫本院">高醫本院</option>
+                                    <option value="高醫岡山">高醫岡山</option>
+                                    <option value="小港醫院">小港醫院</option>
+                                    <option value="信義醫院">信義醫院</option>
+                                    <option value="部立屏東醫院">部立屏東醫院</option>
+                                </select>
+                            </div>
+
+                            <div class="w-full">
+                                <label class="block text-sm font-semibold text-slate-700 mb-1">病歷號</label>
+                                <div class="relative w-full">
+                                    <input type="text" name="chartNo" class="form-input" placeholder="例如: 12345678"
+                                        required />
+                                </div>
+                            </div>
+
+                            <div class="w-full">
+                                <label class="block text-sm font-semibold text-slate-700 mb-1">個案姓名</label>
+                                <input type="text" name="name" class="form-input" placeholder="請輸入姓名" required />
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="w-full">
+                                    <label class="block text-sm font-semibold text-slate-700 mb-1">出生日期</label>
+                                    <input type="date" id="dob" name="dob" onchange="calculateAge()" class="form-input"
+                                        required />
+                                </div>
+                                <div class="w-full">
+                                    <label class="block text-sm font-semibold text-slate-700 mb-1">年齡</label>
+                                    <input type="number" id="age" name="age"
+                                        class="form-input bg-gray-200 cursor-not-allowed text-center font-bold" readonly
+                                        tabindex="-1" />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-1">性別</label>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <label class="cursor-pointer relative w-full">
+                                        <input type="radio" name="gender" value="Male" class="card-radio sr-only" />
+                                        <div
+                                            class="h-[48px] border border-slate-300 rounded-lg flex items-center justify-center gap-2 hover:bg-slate-50 transition-all bg-white">
+                                            <span class="text-slate-600 font-medium">男性</span>
+                                            <svg class="w-4 h-4 text-primary-600 check-icon opacity-0 transition-opacity absolute right-3"
+                                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                                    d="M5 13l4 4L19 7"></path>
+                                            </svg>
+                                        </div>
+                                    </label>
+                                    <label class="cursor-pointer relative w-full">
+                                        <input type="radio" name="gender" value="Female" class="card-radio sr-only" />
+                                        <div
+                                            class="h-[48px] border border-slate-300 rounded-lg flex items-center justify-center gap-2 hover:bg-slate-50 transition-all bg-white">
+                                            <span class="text-slate-600 font-medium">女性</span>
+                                            <svg class="w-4 h-4 text-primary-600 check-icon opacity-0 transition-opacity absolute right-3"
+                                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                                    d="M5 13l4 4L19 7"></path>
+                                            </svg>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <details id="sec-test" class="bg-white rounded-xl shadow-sm border border-slate-200 group" open>
+                        <summary
+                            class="bg-slate-50 px-6 py-4 border-b border-slate-100 flex items-center justify-between cursor-pointer select-none">
+                            <h2 class="font-bold text-slate-800 text-lg flex items-center">
+                                <span
+                                    class="bg-primary-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs mr-3">2</span>
+                                運動測試結果
+                            </h2>
+                            <svg class="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </summary>
+                        <div class="p-4 md:p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            <div class="relative">
+                                <label
+                                    class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">Resting
+                                    HR</label>
+                                <div class="flex items-stretch">
+                                    <input type="number" name="restingHR"
+                                        class="form-input rounded-r-none border-r-0 font-mono text-lg"
+                                        placeholder="--" />
+                                    <span
+                                        class="bg-slate-200 border border-slate-300 rounded-r-lg px-3 flex items-center text-slate-600 text-sm font-bold whitespace-nowrap">bpm</span>
+                                </div>
+                            </div>
+                            <div class="relative">
+                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">Max
+                                    HR (220-Age)</label>
+                                <div class="flex items-stretch">
+                                    <input type="number" id="maxHR" name="maxHR"
+                                        class="form-input rounded-r-none border-r-0 font-mono text-lg text-primary-700 font-bold"
+                                        placeholder="--" />
+                                    <button type="button" onclick="calculateMaxHR()"
+                                        class="bg-primary-50 border border-primary-200 hover:bg-primary-100 text-primary-700 rounded-r-lg px-4 flex items-center text-xs font-bold transition-colors whitespace-nowrap">計算</button>
+                                </div>
+                            </div>
+                            <div class="relative">
+                                <label
+                                    class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">VO2max
+                                    (METs)</label>
+                                <input type="number" name="vo2maxMets" class="form-input font-mono text-lg"
+                                    placeholder="0.00" step="0.01" />
+                            </div>
+                            <div class="relative">
+                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wide mb-1">6 MWT
+                                    (公尺)</label>
+                                <input type="number" name="sixMWT" class="form-input font-mono text-lg"
+                                    placeholder="0.0" step="0.1" />
+                            </div>
+                            <div class="hidden">
+                                <input type="number" name="vo2maxMl">
+                            </div>
+                        </div>
+                    </details>
+
+                    <details id="sec-func" class="bg-white rounded-xl shadow-sm border border-slate-200 group" open>
+                        <summary
+                            class="bg-slate-50 px-6 py-4 border-b border-slate-100 flex items-center justify-between cursor-pointer select-none">
+                            <h2 class="font-bold text-slate-800 text-lg flex items-center">
+                                <span
+                                    class="bg-primary-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs mr-3">3</span>
+                                功能性評估
+                            </h2>
+                            <svg class="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </summary>
+                        <div class="p-4 md:p-6">
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                                <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                                    <label class="block text-xs text-slate-500 mb-1">慣用手握力 (kg)</label>
+                                    <input type="number" name="gripStrength"
+                                        class="w-full bg-white border border-slate-300 rounded p-2 focus:border-primary-500 outline-none text-center font-mono text-xl"
+                                        placeholder="-" step="0.1" />
+                                </div>
+                                <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                                    <label class="block text-xs text-slate-500 mb-1">30s 手臂彎舉 (下)</label>
+                                    <input type="number" name="bicepCurl"
+                                        class="w-full bg-white border border-slate-300 rounded p-2 focus:border-primary-500 outline-none text-center font-mono text-xl"
+                                        placeholder="-" />
+                                </div>
+                                <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                                    <label class="block text-xs text-slate-500 mb-1">30s 坐到站 (下)</label>
+                                    <input type="number" name="sitToStand"
+                                        class="w-full bg-white border border-slate-300 rounded p-2 focus:border-primary-500 outline-none text-center font-mono text-xl"
+                                        placeholder="-" />
+                                </div>
+                                <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                                    <label class="block text-xs text-slate-500 mb-1">單腳站立 (秒)</label>
+                                    <input type="number" name="oneLegStance"
+                                        class="w-full bg-white border border-slate-300 rounded p-2 focus:border-primary-500 outline-none text-center font-mono text-xl"
+                                        placeholder="-" step="0.1" />
+                                </div>
+                            </div>
+
+                            <div class="bg-orange-50 rounded-lg p-4 border border-orange-100">
+                                <label class="label-text flex justify-between items-center mb-4">
+                                    <span class="text-orange-800 font-bold">疲勞量表 (VAS 0-10)</span>
+                                    <span id="fatigueValue" class="text-2xl font-bold text-orange-600">0</span>
+                                </label>
+                                <input type="range" name="fatigueScale" min="0" max="10" value="0" step="1"
+                                    class="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-orange-500"
+                                    oninput="document.getElementById('fatigueValue').innerText = this.value; this.style.background = `linear-gradient(to right, #fb923c 0%, #fb923c ${this.value*10}%, #e5e7eb ${this.value*10}%, #e5e7eb 100%)`">
+                                <div class="flex justify-between text-xs text-orange-400 mt-2 font-medium">
+                                    <span>無感 (0)</span>
+                                    <span>極度疲勞 (10)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </details>
+
+                    <details id="sec-ultra" class="bg-white rounded-xl shadow-sm border border-slate-200 group">
+                        <summary
+                            class="bg-slate-50 px-6 py-4 border-b border-slate-100 flex items-center justify-between cursor-pointer select-none">
+                            <h2 class="font-bold text-slate-800 text-lg flex items-center">
+                                <span
+                                    class="bg-primary-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs mr-3">4</span>
+                                肌肉骨骼超音波
+                            </h2>
+                            <svg class="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </summary>
+                        <div class="p-4 md:p-6 space-y-3">
+                            <div class="flex items-center gap-3">
+                                <span class="text-slate-400 font-bold">1.</span>
+                                <input type="text" name="ultrasound1" class="form-input" placeholder="檢查部位與結果..." />
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="text-slate-400 font-bold">2.</span>
+                                <input type="text" name="ultrasound2" class="form-input" placeholder="..." />
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="text-slate-400 font-bold">3.</span>
+                                <input type="text" name="ultrasound3" class="form-input" placeholder="..." />
+                            </div>
+                        </div>
+                    </details>
+
+                    <details id="sec-history" class="bg-white rounded-xl shadow-sm border border-slate-200 group">
+                        <summary
+                            class="bg-slate-50 px-6 py-4 border-b border-slate-100 flex items-center justify-between cursor-pointer select-none">
+                            <h2 class="font-bold text-slate-800 text-lg flex items-center">
+                                <span
+                                    class="bg-primary-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs mr-3">5</span>
+                                醫療史總結
+                            </h2>
+                            <svg class="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </summary>
+                        <div class="p-4 md:p-6 space-y-5">
+                            <div>
+                                <div class="flex justify-between items-center mb-1">
+                                    <label class="text-sm font-semibold text-slate-700">主要診斷</label>
+                                    <div class="flex gap-1 flex-wrap">
+                                        <button type="button" onclick="appendTx('mainDiagnosis', '高血壓')"
+                                            class="chip text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded border border-blue-100 hover:bg-blue-100">高血壓</button>
+                                        <button type="button" onclick="appendTx('mainDiagnosis', '糖尿病')"
+                                            class="chip text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded border border-blue-100 hover:bg-blue-100">糖尿病</button>
+                                        <button type="button" onclick="appendTx('mainDiagnosis', '血脂異常')"
+                                            class="chip text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded border border-blue-100 hover:bg-blue-100">血脂異常</button>
+                                        <button type="button" onclick="appendTx('mainDiagnosis', '代謝症候群')"
+                                            class="chip text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded border border-blue-100 hover:bg-blue-100">代謝症候群</button>
+                                        <button type="button" onclick="appendTx('mainDiagnosis', '代謝性脂肪肝病')"
+                                            class="chip text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded border border-blue-100 hover:bg-blue-100">代謝性脂肪肝病</button>
+                                    </div>
+                                </div>
+                                <textarea name="mainDiagnosis" rows="2" class="form-input"
+                                    placeholder="輸入診斷..."></textarea>
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between items-center mb-1">
+                                    <label class="text-sm font-semibold text-slate-700">過去病史</label>
+                                    <div class="flex gap-1 flex-wrap">
+                                        <button type="button" onclick="appendTx('pastHistory', '高血壓')"
+                                            class="chip text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded border border-slate-200 hover:bg-slate-200">高血壓</button>
+                                        <button type="button" onclick="appendTx('pastHistory', '糖尿病')"
+                                            class="chip text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded border border-slate-200 hover:bg-slate-200">糖尿病</button>
+                                        <button type="button" onclick="appendTx('pastHistory', '血脂異常')"
+                                            class="chip text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded border border-slate-200 hover:bg-slate-200">血脂異常</button>
+                                        <button type="button" onclick="appendTx('pastHistory', '代謝症候群')"
+                                            class="chip text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded border border-slate-200 hover:bg-slate-200">代謝症候群</button>
+                                        <button type="button" onclick="appendTx('pastHistory', '代謝性脂肪肝病')"
+                                            class="chip text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded border border-slate-200 hover:bg-slate-200">代謝性脂肪肝病</button>
+                                    </div>
+                                </div>
+                                <textarea name="pastHistory" rows="2" class="form-input"></textarea>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="text-sm font-semibold text-slate-700 block mb-1">手術史</label>
+                                    <textarea name="surgeryHistory" rows="2" class="form-input"></textarea>
+                                </div>
+                                <div>
+                                    <label class="text-sm font-semibold text-slate-700 block mb-1">藥物史</label>
+                                    <textarea name="medicationHistory" rows="2" class="form-input"></textarea>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="text-sm font-semibold text-slate-700 block mb-2">是否有規律運動習慣</label>
+                                <div class="flex gap-4">
+                                    <label class="inline-flex items-center">
+                                        <input type="radio" name="regularExercise" value="Yes"
+                                            class="w-5 h-5 text-primary-600 focus:ring-primary-500 border-gray-300">
+                                        <span class="ml-2">有</span>
+                                    </label>
+                                    <label class="inline-flex items-center">
+                                        <input type="radio" name="regularExercise" value="No"
+                                            class="w-5 h-5 text-primary-600 focus:ring-primary-500 border-gray-300">
+                                        <span class="ml-2">無</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </details>
+
+                    <details id="sec-cancer" class="bg-white rounded-xl shadow-sm border border-slate-200 group">
+                        <summary
+                            class="bg-slate-50 px-6 py-4 border-b border-slate-100 flex items-center justify-between cursor-pointer select-none">
+                            <h2 class="font-bold text-slate-800 text-lg flex items-center">
+                                <span
+                                    class="bg-primary-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs mr-3">6</span>
+                                癌症病史
+                            </h2>
+                            <svg class="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </summary>
+                        <div class="p-4 md:p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <div class="flex justify-between items-center mb-1">
+                                    <label class="text-sm font-semibold text-slate-700">癌症種類</label>
+                                    <div class="flex gap-1 flex-wrap justify-end">
+                                        <button type="button" onclick="appendTx('cancerType', '大腸直腸癌')"
+                                            class="chip text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded border border-blue-100 hover:bg-blue-100">大腸直腸癌</button>
+                                        <button type="button" onclick="appendTx('cancerType', '非小細胞肺癌')"
+                                            class="chip text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded border border-blue-100 hover:bg-blue-100">非小細胞肺癌</button>
+                                        <button type="button" onclick="appendTx('cancerType', '乳癌')"
+                                            class="chip text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded border border-blue-100 hover:bg-blue-100">乳癌</button>
+                                        <button type="button" onclick="appendTx('cancerType', '肝癌')"
+                                            class="chip text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded border border-blue-100 hover:bg-blue-100">肝癌</button>
+                                        <button type="button" onclick="appendTx('cancerType', '血液腫瘤癌症')"
+                                            class="chip text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded border border-blue-100 hover:bg-blue-100">血液腫瘤癌症</button>
+                                    </div>
+                                </div>
+                                <input type="text" name="cancerType" class="form-input" placeholder="例如: Breast CA" />
+                            </div>
+                            <div>
+                                <div class="flex justify-between items-center mb-1">
+                                    <label class="text-sm font-semibold text-slate-700">癌症位置</label>
+                                    <!-- Spacer to align with Cancer Type buttons row -->
+                                    <div class="h-[22px]"></div>
+                                </div>
+                                <input type="text" name="cancerLocation" class="form-input" placeholder="例如: Left" />
+                            </div>
+
+                            <div class="md:col-span-2 bg-slate-50 p-4 rounded-lg border border-slate-200">
+                                <label class="block text-sm font-semibold mb-2">遠端轉移狀況</label>
+                                <div class="flex gap-4 mb-3">
+                                    <label class="inline-flex items-center cursor-pointer">
+                                        <input type="radio" name="metastasis" value="No"
+                                            class="w-5 h-5 text-primary-600"
+                                            onclick="document.getElementById('meta-desc').classList.add('hidden')"
+                                            checked>
+                                        <span class="ml-2">無轉移</span>
+                                    </label>
+                                    <label class="inline-flex items-center cursor-pointer">
+                                        <input type="radio" name="metastasis" value="Yes" class="w-5 h-5 text-red-600"
+                                            onclick="document.getElementById('meta-desc').classList.remove('hidden')">
+                                        <span class="ml-2 font-medium text-red-600">有轉移</span>
+                                    </label>
+                                </div>
+                                <input type="text" id="meta-desc" name="metastasisDesc"
+                                    class="form-input hidden border-red-300 focus:border-red-500 focus:ring-red-200"
+                                    placeholder="請描述轉移部位 (如: Bone, Lung)..." />
+                            </div>
+
+                            <textarea name="treatmentStatus" rows="2" class="md:col-span-2 form-input"
+                                placeholder="目前治療狀態..."></textarea>
+                            <textarea name="treatmentsReceived" rows="2" class="md:col-span-2 form-input"
+                                placeholder="已接受治療 (C/T, R/T, OP)..."></textarea>
+
+                            <div class="md:col-span-2">
+                                <div class="flex justify-between mb-1">
+                                    <label class="text-sm font-semibold">副作用</label>
+                                    <div class="flex gap-1">
+                                        <button type="button" onclick="appendTx('treatmentSideEffects', 'Lymphedema')"
+                                            class="chip text-[10px] bg-slate-100 px-2 py-0.5 rounded border border-slate-200 hover:bg-slate-200">Lymphedema</button>
+                                        <button type="button" onclick="appendTx('treatmentSideEffects', 'Neuropathy')"
+                                            class="chip text-[10px] bg-slate-100 px-2 py-0.5 rounded border border-slate-200 hover:bg-slate-200">Neuropathy</button>
+                                        <button type="button" onclick="appendTx('treatmentSideEffects', 'Fatigue')"
+                                            class="chip text-[10px] bg-slate-100 px-2 py-0.5 rounded border border-slate-200 hover:bg-slate-200">Fatigue</button>
+                                    </div>
+                                </div>
+                                <textarea name="treatmentSideEffects" rows="2" class="form-input"
+                                    placeholder="治療副作用..."></textarea>
+                            </div>
+                        </div>
+                    </details>
+
+                    <div id="sec-risk" class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                        <div class="bg-slate-50 px-6 py-4 border-b border-slate-100">
+                            <h2 class="font-bold text-slate-800 text-lg flex items-center">
+                                <span
+                                    class="bg-primary-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs mr-3">7</span>
+                                風險與強度建議
+                            </h2>
+                        </div>
+                        <div class="p-4 md:p-6">
+                            <label class="block text-sm font-bold text-slate-700 mb-3">風險分級</label>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
+                                <label class="cursor-pointer relative">
+                                    <input type="radio" name="riskLevel" value="High" class="card-radio sr-only" />
+                                    <div
+                                        class="border border-slate-300 rounded-lg p-3 text-center hover:bg-red-50 transition-all h-full flex flex-col justify-center">
+                                        <div class="text-red-600 font-bold text-lg">高風險</div>
+                                        <div class="text-xs text-slate-500">需醫師評估</div>
+                                        <svg class="w-5 h-5 text-red-600 check-icon opacity-0 absolute top-2 right-2 transition-all"
+                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer relative">
+                                    <input type="radio" name="riskLevel" value="Medium" class="card-radio sr-only" />
+                                    <div
+                                        class="border border-slate-300 rounded-lg p-3 text-center hover:bg-orange-50 transition-all h-full flex flex-col justify-center">
+                                        <div class="text-orange-600 font-bold text-lg">中風險</div>
+                                        <div class="text-xs text-slate-500">專家監督</div>
+                                        <svg class="w-5 h-5 text-orange-600 check-icon opacity-0 absolute top-2 right-2 transition-all"
+                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer relative">
+                                    <input type="radio" name="riskLevel" value="Low" class="card-radio sr-only" />
+                                    <div
+                                        class="border border-slate-300 rounded-lg p-3 text-center hover:bg-green-50 transition-all h-full flex flex-col justify-center">
+                                        <div class="text-green-600 font-bold text-lg">低風險</div>
+                                        <div class="text-xs text-slate-500">可自行運動</div>
+                                        <svg class="w-5 h-5 text-green-600 check-icon opacity-0 absolute top-2 right-2 transition-all"
+                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <label class="block text-sm font-bold text-slate-700 mb-3">強度建議</label>
+                            <div class="grid grid-cols-1 gap-2">
+                                <label class="cursor-pointer relative">
+                                    <input type="radio" name="intensityRec" value="NotRecommended"
+                                        class="card-radio sr-only" />
+                                    <div
+                                        class="border border-slate-300 rounded-lg p-3 flex items-center hover:bg-slate-50 transition-all">
+                                        <div class="w-2 h-2 rounded-full bg-slate-400 mr-3"></div>
+                                        <span class="font-medium text-slate-700">暫時不建議運動</span>
+                                        <svg class="w-5 h-5 text-primary-600 check-icon opacity-0 ml-auto" fill="none"
+                                            stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer relative">
+                                    <input type="radio" name="intensityRec" value="LowToMedium"
+                                        class="card-radio sr-only" />
+                                    <div
+                                        class="border border-slate-300 rounded-lg p-3 flex items-center hover:bg-slate-50 transition-all">
+                                        <div class="w-2 h-2 rounded-full bg-green-500 mr-3"></div>
+                                        <span class="font-medium text-slate-700">初始低強度 → 可進至中等</span>
+                                        <svg class="w-5 h-5 text-primary-600 check-icon opacity-0 ml-auto" fill="none"
+                                            stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer relative">
+                                    <input type="radio" name="intensityRec" value="LowMediumToHigh"
+                                        class="card-radio sr-only" />
+                                    <div
+                                        class="border border-slate-300 rounded-lg p-3 flex items-center hover:bg-slate-50 transition-all">
+                                        <div class="w-2 h-2 rounded-full bg-blue-500 mr-3"></div>
+                                        <span class="font-medium text-slate-700">初始低至中等 → 可進至高強度</span>
+                                        <svg class="w-5 h-5 text-primary-600 check-icon opacity-0 ml-auto" fill="none"
+                                            stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer relative">
+                                    <input type="radio" name="intensityRec" value="MediumNoHigh"
+                                        class="card-radio sr-only" />
+                                    <div
+                                        class="border border-slate-300 rounded-lg p-3 flex items-center hover:bg-slate-50 transition-all">
+                                        <div class="w-2 h-2 rounded-full bg-orange-400 mr-3"></div>
+                                        <span class="font-medium text-slate-700">初始中等 → 暫不建議高強度</span>
+                                        <svg class="w-5 h-5 text-primary-600 check-icon opacity-0 ml-auto" fill="none"
+                                            stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </div>
+                                </label>
+                                <label class="cursor-pointer relative">
+                                    <input type="radio" name="intensityRec" value="MediumToHigh"
+                                        class="card-radio sr-only" />
+                                    <div
+                                        class="border border-slate-300 rounded-lg p-3 flex items-center hover:bg-slate-50 transition-all">
+                                        <div class="w-2 h-2 rounded-full bg-red-500 mr-3"></div>
+                                        <span class="font-medium text-slate-700">初始中等 → 可進至高強度</span>
+                                        <svg class="w-5 h-5 text-primary-600 check-icon opacity-0 ml-auto" fill="none"
+                                            stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="sec-special" class="bg-white rounded-xl shadow-sm border border-slate-200 group">
+                        <div class="bg-slate-50 px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                            <h2 class="font-bold text-slate-800 text-lg flex items-center">
+                                <span
+                                    class="bg-primary-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs mr-3">8</span>
+                                運動特殊考量
+                            </h2>
+                            <button type="button" onclick="openReferenceModal()"
+                                class="text-sm bg-white border border-slate-300 text-slate-600 px-3 py-1.5 rounded-lg hover:bg-slate-50 transition shadow-sm font-medium flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                </svg>
+                                <span>選擇參考資料</span>
+                            </button>
+                        </div>
+                        <div class="p-4 md:p-6">
+                            <textarea name="specialConsiderations" class="form-input h-32"
+                                placeholder="請輸入需要注意的事項..."></textarea>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+
+            <div id="view-search" class="hidden max-w-4xl mx-auto p-4 lg:p-8">
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+                    <h2 class="text-xl font-bold text-slate-800 mb-4">查詢紀錄</h2>
+                    <div class="flex gap-2 mb-6">
+                        <div class="relative flex-1">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </div>
+                            <input type="text" id="searchInput"
+                                class="w-full pl-10 pr-4 py-3 rounded-lg border border-slate-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 transition"
+                                placeholder="輸入姓名、病歷號、出生日期、院區或評估日期..."
+                                onkeydown="if(event.key==='Enter') searchData()" />
+                        </div>
+                        <button onclick="searchData()"
+                            class="bg-primary-600 text-white px-6 rounded-lg font-bold hover:bg-primary-700 transition shadow-sm">查詢</button>
+                    </div>
+                    <div id="searchResults" class="space-y-3">
+                        <div
+                            class="text-center text-slate-400 py-12 bg-slate-50 rounded-lg border border-dashed border-slate-200">
+                            請輸入關鍵字進行查詢
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <div id="fab-container" class="fixed bottom-6 right-6 z-40 transition-transform duration-300 flex gap-2">
+        <button onclick="cancelEdit()" id="cancelEditBtn"
+            class="hidden bg-slate-500 text-white shadow-lg hover:shadow-xl hover:bg-slate-600 rounded-full px-4 py-4 flex items-center gap-2 font-bold transition-all active:scale-95">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            <span>取消編輯</span>
+        </button>
+        <button onclick="submitData()" id="submitBtn"
+            class="bg-slate-800 text-white shadow-lg hover:shadow-xl hover:bg-slate-900 rounded-full px-6 py-4 flex items-center gap-2 font-bold transition-all active:scale-95">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+            </svg>
+            <span>提交紀錄</span>
+        </button>
+    </div>
+
+    <div id="detailModal"
+        class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl w-full max-w-3xl max-h-[90vh] flex flex-col shadow-2xl">
+            <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-white rounded-t-xl z-10">
+                <h3 class="text-lg font-bold text-slate-800">詳細資料</h3>
+                <button onclick="closeModal()"
+                    class="text-slate-400 hover:text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-full p-2 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div id="detailContent" class="p-6 overflow-y-auto bg-slate-50">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 設定你的 Google Apps Script URL
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzLgAWo7MxH-BO9mnP8soIJtFkH7iLDIPPFMfzGM_zVPK6moTvFramsu4e_NHhMDYJp/exec';
+
+        // 追蹤是否正在編輯現有記錄
+        let editingRowId = null;
+
+        // --- Reference Data (請在此處填入 PDF 中的內容) ---
+        const SpecialConsiderationsData = {
+            // 特殊族群
+            specialPopulations: [
+                {
+                    category: "高血壓 (Hypertension)",
+                    items: [
+                        "運動中之血壓，建議維持在 SBP≦220 mmHg、DBP≦105 mmHg；有氧運動後可能出現運動後低血壓，必要時以輕度緩和運動（如步行）調整。",
+                        "阻力訓練時應避免吸氣並屏氣（即 Valsalva maneuver 伐式操作法），以防血壓劇烈上升，甚至是暈眩及昏倒。",
+                        "使用 β-阻斷劑（尤其非選擇性）者，訓練強度建議依運動測試之峰值心跳或 RPE 量表設定。",
+                        "α-阻斷劑、鈣離子通道阻斷劑(CCB)及血管擴張劑(vasodilator)會引起運動後的血壓突然降低。應加強病人衛教，並延長緩和期、密切監測恢復狀況。"
+                    ]
+                },
+                {
+                    category: "糖尿病 (Diabetes)",
+                    items: [
+                        "運動頻率與型式：第二型糖尿病患者有氧運動中斷不宜超過 2 天；組合訓練時，先阻力後有氧或採高強度間歇訓練（HIIT），可降低第一型糖尿病患者運動後低血糖風險。",
+                        "運動禁忌與注意事項：嚴重視網膜病變者，應避免高強度有氧阻力訓練、跳躍、震動、頭低位活動及 Valsalva maneuver。合併周邊神經病變者應加強足部護理；自主神經病變者運動強度建議以 RPE 評估。",
+                        "運動前血糖管理：理想血糖為 90-250mg/dL；低血糖（<70 mg/dL）為相對禁忌。胰島素使用者若血糖≦100mg/dL，運動前應補充 10-15g 碳水化合物。",
+                        "有經歷過運動引起的低血糖症之 DM 患者理想上應當與同伴一起或在監督之下運動，以減少再次發生低血糖事件的風險。",
+                        "使用磺醯脲類與促胰島素分泌藥物者會增加運動後低血糖之風險。",
+                        "胰島素風險：胰島素藥物會增加在中等強度有氧運動期間及運動後（最長可達 12 小時）的低血糖風險，必要時需調整運動時機、飲食及胰島素劑量；運動前速效或短效胰島素應視情況減量；長效的基礎胰島素比較不會引起低血糖，但在規律訓練或長時間活動情境下，整體劑量仍可能需要調降；胰島素幫浦使用者可於運動期間降低或暫停基礎輸注，並於運動後視情況持續下調以預防延遲性低血糖。",
+                        "連續血糖監測(CGM)對於監控長期的血糖變動模式非常有效，並且可以評估運動對血糖的立即和延遲效應。",
+                        "高血糖與酮體評估（第一型糖尿病）：第一型糖尿病患者運動前需警覺高血糖與酮酸中毒風險（如疲倦、丙酮味呼吸）。血糖≧250 mg/dL 時應檢測酮體：若有酮體應延後運動；若無酮體且無不適，可進行中等強度運動，但須頻繁監測並補水。若血糖≧350 mg/dL，即便無酮體，也應先進行胰島素矯正再運動。",
+                        "高血糖風險：不論運動前血糖為何，任何高強度運動會促使腎上腺素與升糖素分泌，導致血糖上升。因此，第一型糖尿病患者可能需補充少量胰島素，以應對運動後的高血糖問題。"
+                    ]
+                },
+                {
+                    category: "血脂異常 (Dyslipidemia)",
+                    items: [
+                        "服用降血脂藥物，像是 statin 類、fibric acid 類者，運動時應注意肌肉無力或疼痛；雖屬少見，仍可能發生嚴重肌肉傷害。"
+                    ]
+                },
+                {
+                    category: "過重或肥胖 (Overweight or Obesity)",
+                    items: [
+                        "運動量建議：為維持長期減重成果，建議每週累積≧250 分鐘中等至高強度運動(≧2,000 kcal/週)，分布於 5-7 天；過重或肥胖者可透過每日多次、每次≧10 分鐘之活動或生活型中等強度活動累積。",
+                        "減重策略：減重應結合飲食與運動介入，每日減少 500-1,000kcal，可達每週約 0.5-0.9kg 體重下降，並應同時改善飲食品質。",
+                        "運動型式調整：體重較高者建議選擇低衝擊運動，以降低膝踝關節負擔。",
+                        "藥物與手術治療：接受減重藥物(如 GLP-1 受體促效劑)或減重手術者，皆建議納入結構化的中等至高強度運動計畫，以促進並維持體重與脂肪量的減少。"
+                    ]
+                },
+                {
+                    category: "代謝症候群 (Metabolic Syndrome)",
+                    items: [
+                        "代謝症候群患者若為達成維持成效，運動量可逐步增加至每週 250-300 分鐘(或 5 天/週，每日 50-60 分鐘)，並可由多次≧10 分鐘的活動累積；部分個案可能需進展至 60-90 分鐘/日。",
+                        "HIIT 建議：高強度間歇訓練(HIIT)可改善代謝症候群，但建議選擇低衝擊型式以降低受傷風險。"
+                    ]
+                },
+                {
+                    category: "代謝性脂肪肝病 (MASLD)",
+                    items: [
+                        "MASLD 患者常伴隨較高之痛覺敏感度、疲勞感、及骨關節炎，運動處方應個別化調整。",
+                        "運動目標為逐步達到≧30 分鐘/天的中至高強度運動，型式可包含中等強度有氧或 HIIT；進行 HIIT 時建議選擇低衝擊運動以降低受傷風險。"
+                    ]
+                },
+                {
+                    category: "腎臟疾病 (Kidney Disease)",
+                    items: [
+                        "非透析 CKD 患者：經過適當篩檢後，多可採一般族群運動處方，由低至中等強度開始並逐步進展；衰弱者可採間歇運動，如 3 分鐘運動：3 分鐘休息(1:1)，再逐步延長運動、縮短休息。",
+                        "血液透析患者：可於狀態穩定時進行透析中（intradialytic）運動，像是坐著邊透析邊使用登階或是踩踏器材。建議安排於透析前半段以降低低血壓風險；運動強度以 RPE 監測較為適合。成熟之動靜脈廔管可安全進行阻力訓練，但應避免壓迫、撞擊與使用透析側上肢；不建議進行 1RM 最大肌力測試，因個案常有繼發性副甲狀腺亢進及骨骼問題。",
+                        "腹膜透析患者：CAPD 患者腹腔仍有透析液時可嘗試運動，若不適可先引流排出液體；有腹膜透析導管者應避免全程屈髖的仰臥起坐動作，腹部訓練可改為等長收縮或部分仰臥起坐。游泳對導管患者可能因感染風險而具有挑戰。若要游泳，應使用防水貼布保護導管。",
+                        "腎臟移植患者：排斥反應期應降低運動強度與時間但不需完全停止；若仍屬免疫抑制狀態，運動環境與器材須特別注意清潔與消毒。"
+                    ]
+                },
+                {
+                    category: "關節炎 (Arthritis)",
+                    items: [
+                        "運動建議：關節炎患者可進行中高衝擊運動（如跑步、登階），但因心肺及肌力通常較低，應循序漸進以降低關節傷害風險；急性發作期避免肌力訓練，但可進行輕柔關節活動度訓練。",
+                        "疼痛與強度管理：適當暖身與緩和(5-10 分鐘，包括全關節活動範圍及低強度有氧)可減少疼痛；運動中或運動後輕微不適常見，不代表關節受損。但若疼痛在運動後 2 小時加劇，應減少時間或強度。鼓勵選擇一天中疼痛最少或藥效最佳時運動。",
+                        "漸進與功能訓練：初期每 1-2 週增加運動 5-10 分鐘；融入功能性運動以增進神經肌肉控制、平衡及日常生活能力（如站立、爬樓梯）。"
+                    ]
+                }
+            ],
+            // 癌症族群
+            cancerPopulations: [
+                {
+                    category: "人工血管 (Port-A / PICC)",
+                    items: [
+                        "植入部位運動注意事項：避免對植入側施加直接壓力（如伏地挺身或不適器械），植入後的初期數週限制高強度阻力訓練，但可進行輕度活動及日常範圍運動；注意植入部位有無紅腫、疼痛、分泌物或發燒等感染跡象；植入處皮膚完全癒合後可考慮游泳，但要避免在水質不佳的水域活動。",
+                        "植入式中心靜脈導管 Port-A：裝設後前 3 週或正在接受化療時避免胸部訓練；植入側之手臂須避免激烈運動，尤其要避免 360 度旋轉手臂動作，如：網球、羽球、舉重，以及部分瑜伽動作等，以免導管移位。",
+                        "周邊植入中心靜脈導管 PICC：運動時確保導管覆蓋完整，避免被勾拉；敷料變硬時即需更換；上肢運動應循序漸進，尊重患者舒適度與信心。"
+                    ]
+                },
+                {
+                    category: "造口 (Ostomy)",
+                    items: [
+                        "造口患者運動注意事項：運動時應確保造口袋排空且固定良好。若出現造口周圍腫脹或不適，應停止運動並就醫。",
+                        "阻力訓練：應從低強度開始，循序增加負荷，避免 Valsalva maneuver (即吸氣並屏住呼吸)和任何會造成明顯腹內壓或腹部鼓起的核心動作。",
+                        "迴腸造口 (ileostomy) 患者較容易脫水。運動前、運動中與運動後應依醫療專業建議採取最佳的補水策略。",
+                        "參與接觸性運動或可能遭受撞擊於造口區域的人，可考慮穿戴造口保護器 (ostomy protector/shield)。"
+                    ]
+                },
+                {
+                    category: "上下肢淋巴水腫 (Lymphedema)",
+                    items: [
+                        "淋巴水腫患者運動原則：逐步、受控的漸進性重量訓練可改善肌力與生活品質，不會增加水腫惡化風險；若有急性紅腫、疼痛或感染徵兆時應暫停運動並尋求醫療協助。",
+                        "壓力衣與皮膚保護：雖無強力的證據支持運動時穿著壓力衣，但已知其對受影響肢體安全性較高，通常建議受影響肢體穿著處方得宜的壓力衣或袖套；水療期間可不用；避免在受影響肢體針刺、抽血或量血壓，保持皮膚清潔並避免割傷或昆蟲叮咬。"
+                    ]
+                },
+                {
+                    category: "周邊神經病變 (Peripheral Neuropathy)",
+                    items: [
+                        "神經病變患者運動安全：運動前評估穩定度、平衡與步態；若穩定性受影響，可選擇替代步行的有氧（如固定腳踏車、水中運動）或使用具安全扶手的跑步機。",
+                        "裝備與環境：穿著穩固、合腳、有良好鞋底的鞋子，避免赤腳或在不平地面運動；避免極冷或極熱環境，以防凍傷或燙傷。",
+                        "阻力訓練：器材式訓練優於自由重量訓練；當使用手持重量器材時，應監測手部不適或疼痛，亦可考慮使用具軟質/橡膠包覆的啞鈴，以及/或配戴具緩衝襯墊的手套。"
+                    ]
+                },
+                {
+                    category: "血液功能異常 (Blood Count Abnormalities)",
+                    items: [
+                        "血小板減少症 (/μl)：50,000-150,000：可進行有氧與阻力訓練，但須避開高衝擊或易出血活動。",
+                        "血小板減少症 (/μl)：20,000-50,000：限步行、固定腳踏車或彈力帶訓練；過程中須嚴密監測瘀青或牙齦出血。",
+                        "血小板減少症 (/μl)：10,000-20,000：僅限無阻力的輕度活動，如步行與溫和伸展。",
+                        "血小板減少症 (/μl)：低於 10,000：因有自發性出血風險，應大幅限制活動。",
+                        "貧血患者 (Hb≧10g/dL)：可進行中等強度運動並逐步增加，但應避免高強度運動；過程中須監測疲勞、氣促及頭暈狀況。",
+                        "貧血患者 (Hb: 8-10g/dL)：僅限低至中等強度的短時間運動；若症狀加劇應減量或停止。",
+                        "貧血患者 (Hb<8g/dL)：僅限低強度步行、日常生活活動(ADL)與伸展；避免中高強度及阻力訓練；若症狀顯著應考慮輸血。",
+                        "貧血患者 (Hb<7 g/dL 有症狀)：不建議運動，應停止全部運動，等待醫療介入。",
+                        "白血球減少症 (WBC>3,000 或 ANC>1,500)：正常運動可行，無特殊限制。",
+                        "白血球減少症 (ANC: 1,000-1,500)：可進行中等強度運動，但應避免人潮密集的運動場合，並監測感染症狀。",
+                        "白血球減少症 (ANC: 500-1,000)：僅限在乾淨、可控的室內環境進行低強度運動；避免健身房、公眾器材及游泳池；落實嚴格手部衛生。",
+                        "白血球減少症 (ANC<500 重度低下)：僅限在家中進行輕微伸展與日常輕活動；避免外出及任何共享器材運動。",
+                        "發燒性中性白血球低下 (ANC低下 + 發燒)：禁忌，必須停止全部運動，立即就醫。"
+                    ]
+                },
+                {
+                    category: "骨質流失/骨轉移 (Bone Loss / Bone Metastasis)",
+                    items: [
+                        "無骨轉移但有骨質疏鬆者，可以進行低衝擊的負重活動（如步行）並納入平衡訓練來降低跌倒風險。",
+                        "有骨轉移者經醫療團隊評估風險可控後，可進行低至中等強度有氧（非衝擊式）與溫和阻力訓練，避免高衝擊、扭轉或對脆落骨骼直接負荷。",
+                        "應警覺骨痛或骨轉移徵象(常見轉移部位:脊椎、肋骨、肱骨、股骨、骨盆)，出現可疑症狀時立即轉介醫療團隊，暫停運動。",
+                        "脊椎轉移患者需評估是否需穿戴頸圈/背架；即使穿戴護具，運動仍需限制低負荷、無衝擊、避免彎曲、舉重及扭轉之動作。",
+                        "骨盆轉移：可進行上肢與軀幹阻力訓練、避免髖關節主導的下肢阻力動作但可保留膝部運動；有氧運動建議以非承重運動為主；靜態伸展無特別限制。",
+                        "腰椎轉移：可進行上肢與下肢阻力訓練；有氧運動建議以非承重運動為主；靜態伸展需避免任何脊椎屈曲、伸展與旋轉。",
+                        "胸椎及肋骨轉移：可進行上肢與下肢阻力訓練，上肢需避免肩部大幅度屈曲/伸展/內收(可做肘屈伸)；有氧運動承重和非承重運動都可以；靜態伸展需避免任何脊椎屈曲、伸展與旋轉。",
+                        "股骨近端轉移：可進行上肢與軀幹阻力訓練、避免髖關節主導的下肢阻力動作但可保留膝部運動；有氧運動建議以非承重運動為主；靜態伸展無特別限制。",
+                        "多部位骨轉移：上肢需避開肩部大幅移動作且下肢需避開髖屈伸(可保留肘/膝屈伸)；有氧建議以非承重運動為主；靜態伸展需避免脊椎屈曲/伸展/旋轉。"
+                    ]
+                },
+                {
+                    category: "幹細胞移植患者 (Stem Cell Transplant)",
+                    items: [
+                        "以居家低強度、高頻率、短時間運動為主，逐步增加負荷；免疫系統完全恢復前建議以居家運動為主，避免公共運動場所；運動量需依當日身體狀況調整。"
+                    ]
+                }
+            ]
+        };
+
+        function openReferenceModal() {
+            const modal = document.getElementById('detailModal');
+            const content = document.getElementById('detailContent');
+            const title = modal.querySelector('h3');
+
+            title.innerText = "選擇運動特殊考量";
+
+            // Helper function to render a category group
+            const renderGroup = (groupData, prefix) => {
+                return groupData.map((group, gIndex) => `
+<div class="mb-4 last:mb-0 bg-slate-50 rounded-lg border border-slate-200 overflow-hidden">
+    <div class="px-4 py-2 bg-slate-100 border-b border-slate-200 font-bold text-slate-700 flex justify-between items-center cursor-pointer hover:bg-slate-200 transition"
+        onclick="toggleGroup(this)">
+        <span>${group.category}</span>
+        <svg class="w-4 h-4 transform transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+    </div>
+    <div class="p-3 space-y-2 hidden">
+        ${group.items.map((item, iIndex) => `
+        <label
+            class="flex items-start gap-3 p-2 rounded hover:bg-white cursor-pointer transition select-none group-item">
+            <div class="flex items-center h-5 mt-0.5">
+                <input type="checkbox" name="${prefix}-${gIndex}" value="${item}"
+                    class="w-4 h-4 text-primary-600 rounded border-slate-300 focus:ring-primary-500 transition cursor-pointer">
+            </div>
+            <span class="text-slate-600 text-sm leading-relaxed">${item}</span>
+        </label>
+        `).join('')}
+    </div>
+</div>
+`).join('');
+            };
+
+            // Generate HTML for the modal
+            let html = `
+<div class="space-y-6">
+    <div class="bg-blue-50 p-4 rounded-lg border border-blue-100 text-sm text-blue-800 mb-4 shadow-sm">
+        <p class="font-bold mb-1 flex items-center gap-1">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            使用說明
+        </p>
+        <ul class="list-disc pl-5 mt-1 space-y-1">
+            <li>點擊分類標題可展開/收合細項。</li>
+            <li>勾選需要的注意事項，點擊「確認帶入」加入下方編輯區。</li>
+        </ul>
+    </div>
+
+    <div>
+        <h4 class="font-bold text-lg text-slate-800 mb-3 border-b pb-2 flex items-center gap-2">
+            <svg class="w-5 h-5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+            特殊族群
+        </h4>
+        <div class="space-y-2">
+            ${renderGroup(SpecialConsiderationsData.specialPopulations, 'special')}
+        </div>
+    </div>
+
+    <div>
+        <h4 class="font-bold text-lg text-slate-800 mb-3 border-b pb-2 flex items-center gap-2 mt-6">
+            <svg class="w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
+            癌症族群
+        </h4>
+        <div class="space-y-2">
+            ${renderGroup(SpecialConsiderationsData.cancerPopulations, 'cancer')}
+        </div>
+    </div>
+
+    <div
+        class="flex justify-end gap-3 pt-4 border-t border-slate-100 sticky bottom-0 bg-white/95 backdrop-blur py-4 z-10">
+        <button onclick="closeModal()"
+            class="px-5 py-2.5 text-slate-600 hover:bg-slate-100 rounded-lg transition font-medium">取消</button>
+        <button onclick="confirmReferenceSelection()"
+            class="px-5 py-2.5 bg-slate-800 text-white rounded-lg hover:bg-slate-900 shadow-lg hover:shadow-xl transition font-bold flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd"
+                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                    clip-rule="evenodd" />
+            </svg>
+            確認帶入
+        </button>
+    </div>
+</div>
+`;
+
+            content.innerHTML = html;
+            modal.classList.remove('hidden');
+        }
+
+        // Toggle visibility of check items
+        function toggleGroup(header) {
+            const content = header.nextElementSibling;
+            const icon = header.querySelector('svg');
+            content.classList.toggle('hidden');
+            if (content.classList.contains('hidden')) {
+                icon.style.transform = 'rotate(0deg)';
+                header.classList.remove('bg-slate-200');
+                header.classList.add('bg-slate-100');
+            } else {
+                icon.style.transform = 'rotate(180deg)';
+                header.classList.remove('bg-slate-100');
+                header.classList.add('bg-slate-200');
+            }
+        }
+
+        function confirmReferenceSelection() {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"][name*="-"]:checked');
+            const selectedTexts = Array.from(checkboxes).map(cb => cb.value);
+
+            if (selectedTexts.length > 0) {
+                const textarea = document.querySelector('textarea[name="specialConsiderations"]');
+                const currentContent = textarea.value.trim();
+
+                // Add bullet points
+                const formattedTexts = selectedTexts.map(text => "• " + text);
+
+                if (currentContent === "") {
+                    textarea.value = formattedTexts.join('\n');
+                } else {
+                    textarea.value += '\n' + formattedTexts.join('\n');
+                }
+
+                const btn = document.querySelector('button[onclick="confirmReferenceSelection()"]');
+                btn.innerText = "已帶入！";
+                btn.classList.remove('bg-slate-800', 'hover:bg-slate-900');
+                btn.classList.add('bg-green-600', 'hover:bg-green-700');
+
+                setTimeout(() => {
+                    closeModal();
+                    document.getElementById('sec-special').scrollIntoView({ behavior: 'smooth' });
+                }, 500);
+            } else {
+                closeModal();
+            }
+        }
+        // --- Frontend Utility Functions ---
+
+        document.getElementById('main-scroll').addEventListener('scroll', function () {
+            const sections = document.querySelectorAll('main section, main details, main div[id^="sec-"]');
+            const navLinks = document.querySelectorAll('.nav-link');
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (this.scrollTop >= (sectionTop - 150)) {
+                    current = section.getAttribute('id');
+                }
+            });
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').includes(current)) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        function switchTab(tab) {
+            const formView = document.getElementById('view-form');
+            const searchView = document.getElementById('view-search');
+            const tabForm = document.getElementById('tab-form');
+            const tabSearch = document.getElementById('tab-search');
+            const fab = document.getElementById('fab-container');
+            const nav = document.querySelector('nav');
+
+            if (tab === 'form') {
+                formView.classList.remove('hidden');
+                searchView.classList.add('hidden');
+                tabForm.classList.remove('text-slate-500', 'bg-transparent');
+                tabForm.classList.add('bg-white', 'text-primary-700', 'shadow-sm');
+                tabSearch.classList.add('text-slate-500');
+                tabSearch.classList.remove('bg-white', 'shadow-sm');
+                fab.classList.remove('translate-y-24');
+                if (window.innerWidth >= 1024) nav.classList.remove('hidden');
+            } else {
+                formView.classList.add('hidden');
+                searchView.classList.remove('hidden');
+                tabSearch.classList.remove('text-slate-500', 'bg-transparent');
+                tabSearch.classList.add('bg-white', 'text-primary-700', 'shadow-sm');
+                tabForm.classList.add('text-slate-500');
+                tabForm.classList.remove('bg-white', 'shadow-sm');
+                fab.classList.add('translate-y-24');
+                if (window.innerWidth >= 1024) nav.classList.add('hidden');
+            }
+        }
+
+        function appendTx(name, text) {
+            const el = document.getElementsByName(name)[0];
+            if (el) {
+                const current = el.value;
+                el.value = current ? current + (current.endsWith(' ') ? '' : ', ') + text : text;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('date').valueAsDate = new Date();
+            const firstLink = document.querySelector('.nav-link');
+            if (firstLink) firstLink.classList.add('active');
+        });
+
+        function calculateAge() {
+            const dobInput = document.getElementById('dob').value;
+            if (!dobInput) return;
+            const dob = new Date(dobInput);
+            const today = new Date();
+            let age = today.getFullYear() - dob.getFullYear();
+            const m = today.getMonth() - dob.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
+            document.getElementById('age').value = age;
+        }
+
+        function calculateMaxHR() {
+            const age = document.getElementById('age').value;
+            if (!age) {
+                Swal.fire({ icon: 'warning', title: '請先輸入出生日期', confirmButtonColor: '#0ea5e9' });
+                return;
+            }
+            document.getElementById('maxHR').value = 220 - parseInt(age, 10);
+        }
+
+        async function fetchJsonSafe(url, options) {
+            const res = await fetch(url, options);
+            const text = await res.text();
+            try { return JSON.parse(text); } catch (_) { return { raw: text }; }
+        }
+
+        async function submitData() {
+            const form = document.getElementById('assessmentForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const submitBtn = document.getElementById('submitBtn');
+            const originalContent = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<svg class="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><span>處理中...</span>';
+
+            try {
+                const fd = new FormData(form);
+                const params = new URLSearchParams();
+                for (const [k, v] of fd.entries()) params.append(k, v);
+                // 判斷是新增還是更新
+                if (editingRowId) {
+                    params.append('action', 'update');
+                    params.append('rowId', editingRowId);
+                } else {
+                    params.append('action', 'submit');
+                }
+
+                let data;
+                try {
+                    data = await fetchJsonSafe(SCRIPT_URL, { method: 'POST', body: params });
+                } catch (err) {
+                    await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: params });
+                    data = { result: 'success', note: 'no-cors-fallback' };
+                }
+
+                if (data && data.result === 'success') {
+                    const successMsg = editingRowId ? '更新成功!' : '提交成功!';
+                    await Swal.fire({ icon: 'success', title: successMsg, confirmButtonColor: '#0ea5e9' });
+
+                    // 重置編輯狀態
+                    editingRowId = null;
+                    updateSubmitButton();
+
+                    form.reset();
+                    document.getElementById('date').valueAsDate = new Date();
+                    document.getElementById('fatigueValue').innerText = '0';
+                    document.getElementById('meta-desc').classList.add('hidden');
+                    document.getElementById('main-scroll').scrollTo(0, 0);
+                } else {
+                    throw new Error((data && (data.error || data.raw)) ? (data.error || data.raw) : 'Unknown error');
+                }
+            } catch (error) {
+                console.error(error);
+                Swal.fire({ icon: 'error', title: '提交失敗', text: String(error.message || error), confirmButtonColor: '#0ea5e9' });
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalContent;
+            }
+        }
+
+        async function searchData() {
+            const query = document.getElementById('searchInput').value;
+            if (!query) return;
+
+            const resultsDiv = document.getElementById('searchResults');
+            resultsDiv.innerHTML = '<div class="text-center py-8"><svg class="animate-spin h-8 w-8 text-primary-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg></div>';
+
+            try {
+                const params = new URLSearchParams();
+                params.append('action', 'search');
+                params.append('query', query);
+                const data = await fetchJsonSafe(SCRIPT_URL, { method: 'POST', body: params });
+
+                if (data && data.result === 'success') {
+                    renderResults(data.data);
+                } else {
+                    resultsDiv.innerHTML = '<div class="text-center text-red-500 py-8">查詢失敗</div>';
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = '<div class="text-center text-red-500 py-8">發生錯誤</div>';
+            }
+        }
+
+        function renderResults(data) {
+            const resultsDiv = document.getElementById('searchResults');
+            if (!data || data.length === 0) {
+                resultsDiv.innerHTML = '<div class="text-center text-slate-400 py-8 bg-slate-50 rounded">找不到資料</div>';
+                return;
+            }
+
+            resultsDiv.innerHTML = data.map((item) => `
+                <div onclick='showDetail(${JSON.stringify(item).replace(/'/g, "&#39;")})' class="bg-white p-5 rounded-xl border border-slate-200 hover:border-primary-400 cursor-pointer transition-all shadow-sm hover:shadow-md group relative">
+                    
+                    <div class="absolute top-4 right-4 flex flex-col items-end gap-2 z-10">
+                        <div class="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-lg text-sm font-bold border border-indigo-100 truncate max-w-[120px]">
+                            ${item.hospitalBranch || '未指定'}
+                        </div>
+                        <div class="flex gap-1">
+                            <div class="text-slate-400 hover:text-green-600 p-1 rounded hover:bg-green-50 transition" title="編輯"
+                                onclick='event.stopPropagation(); editPatient(${JSON.stringify(item).replace(/'/g, "&#39;")})'>
+                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                            </div>
+                            <div class="text-slate-400 hover:text-primary-600 p-1 rounded hover:bg-primary-50 transition" title="列印"
+                                onclick='event.stopPropagation(); printAssessment(${JSON.stringify(item).replace(/'/g, "&#39;")})'>
+                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col gap-3 pr-24">
+                        <div class="flex items-baseline gap-2">
+                             <h3 class="font-bold text-slate-800 text-lg leading-tight">${item.name}</h3>
+                             <span class="text-slate-600 text-sm">(${item.gender === 'Male' ? '男' : '女'}, ${item.age}歲)</span>
+                        </div>
+
+                        <div class="flex flex-col gap-1 text-sm text-slate-600">
+                             <div class="flex items-center gap-2">
+                                <span class="text-slate-400">病歷號:</span>
+                                <span class="font-mono bg-slate-100 px-2 py-0.5 rounded text-slate-700">${item.chartNo}</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-slate-400">評估日期:</span>
+                                <span class="font-mono font-medium text-slate-800">${item.date}</span>
+                            </div>
+                             <div class="flex items-center gap-2">
+                                <span class="text-slate-400">生日:</span>
+                                <span class="font-mono text-slate-600">${item.dob}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // --- 詳細資料 Modal Logic 更新 (顯示所有欄位) ---
+        function showDetail(item) {
+            const content = document.getElementById('detailContent');
+            const field = (label, value, full = false) => `
+                <div class="${full ? 'col-span-2' : ''} border-b border-slate-100 pb-2 last:border-0">
+                    <span class="block text-xs font-bold text-slate-400 uppercase mb-1">${label}</span>
+                    <span class="block text-slate-800 font-medium whitespace-pre-wrap">${value || '-'}</span>
+                </div>`;
+
+            // Helper mapping
+            const genderMap = { 'Male': '男', 'Female': '女' };
+            const riskMap = { 'High': '高風險', 'Medium': '中風險', 'Low': '低風險' };
+            const exerciseMap = { 'Yes': '有', 'No': '無' };
+            const metaMap = item.metastasis === 'Yes' ? `有(${item.metastasisDesc || ''})` : '無';
+
+            // Intensity mapping
+            let intensityText = item.intensityRec;
+            if (intensityText === 'NotRecommended') intensityText = '暫時不建議運動';
+            else if (intensityText === 'LowToMedium') intensityText = '初始低強度 → 可進至中等';
+            else if (intensityText === 'LowMediumToHigh') intensityText = '初始低至中等 → 可進至高強度';
+            else if (intensityText === 'MediumNoHigh') intensityText = '初始中等 → 暫不建議高強度';
+            else if (intensityText === 'MediumToHigh') intensityText = '初始中等 → 可進至高強度';
+
+            content.innerHTML = `
+                <div class="grid grid-cols-2 gap-x-6 gap-y-4">
+                    <div class="col-span-2 bg-slate-100 p-3 rounded-lg flex justify-between items-center mb-2">
+                        <span class="font-bold text-slate-700">1. 基本資料</span>
+                        <span class="text-xs bg-white px-2 py-1 rounded border">${item.date}</span>
+                    </div>
+                    <div class="col-span-2 grid grid-cols-2 gap-4">
+                        ${field('評估日期', item.date)}
+                        ${field('院區', item.hospitalBranch)}
+                        ${field('病歷號', item.chartNo)}
+                        ${field('姓名', item.name)}
+                        ${field('出生日期', item.dob)}
+                        ${field('年齡', item.age)}
+                        ${field('性別', item.gender === 'Male' ? '男' : '女')}
+                    </div>
+                    <div class="col-span-2 bg-slate-100 p-3 rounded-lg font-bold text-slate-700 mt-4">2. 運動測試</div>
+                    ${field('Resting HR', item.restingHR + ' bpm')} ${field('Max HR', item.maxHR + ' bpm')}
+                    ${field('VO2max (METs)', item.vo2maxMets)} ${field('6MWT', item.sixMWT + ' 公尺')}
+
+                    <div class="col-span-2 bg-slate-100 p-3 rounded-lg font-bold text-slate-700 mt-4">3. 功能性評估</div>
+                    ${field('握力', item.gripStrength + ' kg')} ${field('手臂彎舉', item.bicepCurl + ' 下')}
+                    ${field('坐到站', item.sitToStand + ' 下')} ${field('單腳站立', item.oneLegStance + ' 秒')}
+                    ${field('疲勞量表', item.fatigueScale + ' 分', true)}
+
+                    <div class="col-span-2 bg-slate-100 p-3 rounded-lg font-bold text-slate-700 mt-4">4. 肌肉骨骼超音波</div>
+                    ${field('檢查 1', item.ultrasound1, true)}
+                    ${field('檢查 2', item.ultrasound2, true)}
+                    ${field('檢查 3', item.ultrasound3, true)}
+
+                    <div class="col-span-2 bg-slate-100 p-3 rounded-lg font-bold text-slate-700 mt-4">5. 醫療史總結</div>
+                    ${field('主要診斷', item.mainDiagnosis, true)}
+                    ${field('過去病史', item.pastHistory, true)}
+                    ${field('手術史', item.surgeryHistory, true)}
+                    ${field('藥物史', item.medicationHistory, true)}
+                    ${field('規律運動', exerciseMap[item.regularExercise] || item.regularExercise)}
+
+                    <div class="col-span-2 bg-slate-100 p-3 rounded-lg font-bold text-slate-700 mt-4">6. 癌症病史</div>
+                    ${field('癌症種類', item.cancerType)} ${field('癌症位置', item.cancerLocation)}
+                    ${field('轉移', metaMap, true)}
+                    ${field('治療狀態', item.treatmentStatus, true)}
+                    ${field('已接受治療', item.treatmentsReceived, true)}
+                    ${field('副作用', item.treatmentSideEffects, true)}
+
+                    <div class="col-span-2 bg-slate-100 p-3 rounded-lg font-bold text-slate-700 mt-4">7. 風險與強度</div>
+                    ${field('風險分級', riskMap[item.riskLevel] || item.riskLevel)} 
+                    ${field('強度建議', intensityText, true)}
+
+                    <div class="col-span-2 bg-slate-100 p-3 rounded-lg font-bold text-slate-700 mt-4">8. 特殊考量</div>
+                    ${field('內容', item.specialConsiderations, true)}
+                </div>
+            `;
+            document.getElementById('detailModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('detailModal').classList.add('hidden');
+        }
+
+        // 編輯病人資料 - 將資料帶回表單
+        function editPatient(item) {
+            // 設定編輯狀態
+            editingRowId = item.rowId;
+
+            // 切換到表單頁籤
+            switchTab('form');
+
+            // 填入表單資料
+            const form = document.getElementById('assessmentForm');
+
+            // 基本資料
+            form.querySelector('[name="date"]').value = item.date || '';
+            form.querySelector('[name="hospitalBranch"]').value = item.hospitalBranch || '高醫本院';
+            form.querySelector('[name="chartNo"]').value = item.chartNo || '';
+            form.querySelector('[name="name"]').value = item.name || '';
+            form.querySelector('[name="dob"]').value = item.dob || '';
+            document.getElementById('age').value = item.age || '';
+
+            // 性別 - Radio button
+            const genderRadio = form.querySelector(`[name="gender"][value="${item.gender}"]`);
+            if (genderRadio) genderRadio.checked = true;
+
+            // 運動測試
+            form.querySelector('[name="restingHR"]').value = item.restingHR || '';
+            form.querySelector('[name="maxHR"]').value = item.maxHR || '';
+            form.querySelector('[name="vo2maxMets"]').value = item.vo2maxMets || '';
+            form.querySelector('[name="sixMWT"]').value = item.sixMWT || '';
+
+            // 功能性評估
+            form.querySelector('[name="gripStrength"]').value = item.gripStrength || '';
+            form.querySelector('[name="bicepCurl"]').value = item.bicepCurl || '';
+            form.querySelector('[name="sitToStand"]').value = item.sitToStand || '';
+            form.querySelector('[name="oneLegStance"]').value = item.oneLegStance || '';
+
+            // 疲勞量表
+            const fatigueScale = form.querySelector('[name="fatigueScale"]');
+            fatigueScale.value = item.fatigueScale || 0;
+            document.getElementById('fatigueValue').innerText = item.fatigueScale || 0;
+            fatigueScale.style.background = `linear-gradient(to right, #fb923c 0%, #fb923c ${(item.fatigueScale || 0) * 10}%, #e5e7eb ${(item.fatigueScale || 0) * 10}%, #e5e7eb 100%)`;
+
+            // 超音波
+            form.querySelector('[name="ultrasound1"]').value = item.ultrasound1 || '';
+            form.querySelector('[name="ultrasound2"]').value = item.ultrasound2 || '';
+            form.querySelector('[name="ultrasound3"]').value = item.ultrasound3 || '';
+
+            // 醫療史
+            form.querySelector('[name="mainDiagnosis"]').value = item.mainDiagnosis || '';
+            form.querySelector('[name="pastHistory"]').value = item.pastHistory || '';
+            form.querySelector('[name="surgeryHistory"]').value = item.surgeryHistory || '';
+            form.querySelector('[name="medicationHistory"]').value = item.medicationHistory || '';
+
+            // 規律運動 - Radio button
+            const exerciseRadio = form.querySelector(`[name="regularExercise"][value="${item.regularExercise}"]`);
+            if (exerciseRadio) exerciseRadio.checked = true;
+
+            // 癌症病史
+            form.querySelector('[name="cancerType"]').value = item.cancerType || '';
+            form.querySelector('[name="cancerLocation"]').value = item.cancerLocation || '';
+
+            // 轉移
+            const metaRadio = form.querySelector(`[name="metastasis"][value="${item.metastasis || 'No'}"]`);
+            if (metaRadio) {
+                metaRadio.checked = true;
+                if (item.metastasis === 'Yes') {
+                    document.getElementById('meta-desc').classList.remove('hidden');
+                    form.querySelector('[name="metastasisDesc"]').value = item.metastasisDesc || '';
+                } else {
+                    document.getElementById('meta-desc').classList.add('hidden');
+                }
+            }
+
+            form.querySelector('[name="treatmentStatus"]').value = item.treatmentStatus || '';
+            form.querySelector('[name="treatmentsReceived"]').value = item.treatmentsReceived || '';
+            form.querySelector('[name="treatmentSideEffects"]').value = item.treatmentSideEffects || '';
+
+            // 風險分級 - Radio button
+            const riskRadio = form.querySelector(`[name="riskLevel"][value="${item.riskLevel}"]`);
+            if (riskRadio) riskRadio.checked = true;
+
+            // 強度建議 - Radio button  
+            const intensityRadio = form.querySelector(`[name="intensityRec"][value="${item.intensityRec}"]`);
+            if (intensityRadio) intensityRadio.checked = true;
+
+            // 特殊考量
+            form.querySelector('[name="specialConsiderations"]').value = item.specialConsiderations || '';
+
+            // 更新按鈕顯示
+            updateSubmitButton();
+
+            // 捲動到頂部
+            document.getElementById('main-scroll').scrollTo(0, 0);
+
+            // 顯示提示
+            Swal.fire({
+                icon: 'info',
+                title: '已載入病人資料',
+                text: `正在編輯 ${item.name} 的評估紀錄`,
+                confirmButtonColor: '#0ea5e9',
+                timer: 2000,
+                timerProgressBar: true
+            });
+        }
+
+        // 更新提交按鈕外觀
+        function updateSubmitButton() {
+            const submitBtn = document.getElementById('submitBtn');
+            const cancelBtn = document.getElementById('cancelEditBtn');
+
+            if (editingRowId) {
+                // 顯示取消按鈕
+                cancelBtn.classList.remove('hidden');
+                cancelBtn.classList.add('flex');
+
+                // 更新提交按鈕為更新模式
+                submitBtn.classList.remove('bg-slate-800', 'hover:bg-slate-900');
+                submitBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+                submitBtn.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    <span>更新紀錄</span>
+                `;
+            } else {
+                // 隱藏取消按鈕
+                cancelBtn.classList.add('hidden');
+                cancelBtn.classList.remove('flex');
+
+                // 更新提交按鈕為新增模式
+                submitBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                submitBtn.classList.add('bg-slate-800', 'hover:bg-slate-900');
+                submitBtn.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                    </svg>
+                    <span>提交紀錄</span>
+                `;
+            }
+        }
+
+        // 取消編輯
+        function cancelEdit() {
+            Swal.fire({
+                title: '確定取消編輯？',
+                text: '所有未儲存的修改將會遺失',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: '確定取消',
+                cancelButtonText: '繼續編輯'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // 重置編輯狀態
+                    editingRowId = null;
+                    updateSubmitButton();
+
+                    // 重置表單
+                    document.getElementById('assessmentForm').reset();
+                    document.getElementById('date').valueAsDate = new Date();
+                    document.getElementById('fatigueValue').innerText = '0';
+                    document.getElementById('meta-desc').classList.add('hidden');
+                    document.getElementById('main-scroll').scrollTo(0, 0);
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: '已取消編輯',
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                }
+            });
+        }
+
+        function printAssessment(item) {
+            const printWindow = window.open('', '_blank');
+            // Helper to handle line breaks
+            const v = (val) => String(val || '').replace(/\n/g, '<br>');
+            const box = (val, target) => val === target ? '■' : '□';
+
+            const html = `
+                <!DOCTYPE html>
+                <html lang="zh-TW">
+                    <head>
+                        <meta charset="UTF-8">
+                            <title>列印評估紀錄 - ${v(item.name)}</title>
+                            <style>
+                                @page {
+                                    size: A4 landscape;
+                                    margin: 1cm;
+                                }
+                                body {
+                                    font-family: "BiauKai", "DFKai-SB", "標楷體", serif !important;
+                                    margin: 0;
+                                    padding: 0;
+                                    color: #000;
+                                    font-size: 14px;
+                                    line-height: 1.5;
+                                    display: flex;
+                                    justify-content: center;
+                                }
+                                * {
+                                    font-family: "BiauKai", "DFKai-SB", "標楷體", serif !important;
+                                }
+                                table, tr, td, th, div, span, p, label, b, strong, li {
+                                    font-family: "BiauKai", "DFKai-SB", "標楷體", serif !important;
+                                }
+                                .container {
+                                    width: 100%;
+                                    max-width: 277mm;
+                                    margin: 0 auto;
+                                }
+                                h1 {
+                                    text-align: center;
+                                    font-size: 24px;
+                                    font-weight: bold;
+                                    margin-bottom: 20px;
+                                }
+                                .version {
+                                    text-align: right;
+                                    font-size: 12px;
+                                    margin-bottom: 5px;
+                                }
+                                table {
+                                    width: 100%;
+                                    border-collapse: collapse;
+                                    border: 1px solid #000;
+                                }
+                                td, th {
+                                    border: 1px solid #000;
+                                    padding: 5px 8px;
+                                    vertical-align: top;
+                                }
+                                .section-title {
+                                    font-weight: bold;
+                                    font-size: 16px;
+                                    margin-bottom: 5px;
+                                }
+                                .row {
+                                    display: flex;
+                                    align-items: center;
+                                    margin-bottom: 3px;
+                                }
+                                .label {
+                                    font-weight: bold;
+                                    margin-right: 5px;
+                                    white-space: nowrap;
+                                }
+                                .checkbox-group {
+                                    display: inline-flex;
+                                    gap: 15px;
+                                }
+                                .checkbox-item {
+                                    display: inline-flex;
+                                    align-items: center;
+                                }
+                                ul {
+                                    margin: 0;
+                                    padding-left: 20px;
+                                }
+                                li {
+                                    margin-bottom: 3px;
+                                }
+                                
+                                /* 欄位寬度設定 */
+                                .col-basic { width: 25%; }
+                                .col-test { width: 30%; }
+                                .col-func { width: 25%; }
+                                .col-ultra { width: 20%; }
+                                
+                                .col-medical { width: 23%; }
+                                .col-cancer { width: 22%; }
+                                .col-risk { width: 28%; }
+                                .col-special { width: 27%; }
+
+                                .underline {
+                                    text-decoration: underline;
+                                    text-underline-offset: 3px;
+                                }
+                            </style>
+                    </head>
+                    <body>
+                        <div class="container">
+                            <h1>特殊族群運動訓練前評估紀錄表暨運動處方</h1>
+
+                            <table>
+                                <tr style="height: 150px;">
+                                    <td class="col-basic">
+                                        <div class="row">
+                                            <span class="label">院區：</span>
+                                            <span>${v(item.hospitalBranch)}</span>
+                                        </div>
+                                        <div class="row">
+                                            <span class="label">評估日期：</span>
+                                            <span>${v(item.date).replace(/-/g, ' / ')}</span>
+                                        </div>
+                                        <div class="row">
+                                            <span class="label">個案姓名：</span>
+                                            <span>${v(item.name)}</span>
+                                        </div>
+                                        <div class="row">
+                                            <span class="label">病歷號：</span>
+                                            <span>${v(item.chartNo)}</span>
+                                        </div>
+                                        <div class="row">
+                                            <span class="label">出生日期：</span>
+                                            <span>${v(item.dob).replace(/-/g, ' / ')}</span>
+                                        </div>
+                                        <div class="row">
+                                            <span class="label">性別：</span>
+                                            <div class="checkbox-group">
+                                                <span class="checkbox-item">${box(item.gender, 'Male')} 男</span>
+                                                <span class="checkbox-item">${box(item.gender, 'Female')} 女</span>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <td class="col-test">
+                                        <div class="section-title">運動測試結果：</div>
+                                        <ul>
+                                            <li>休息時心跳： <span class="underline">&nbsp;${v(item.restingHR)}&nbsp;</span> bpm</li>
+                                            <li>最大運動時心跳： <span class="underline">&nbsp;${v(item.maxHR)}&nbsp;</span> bpm</li>
+                                            <li>最大攝氧量： <span class="underline">&nbsp;${v(item.vo2maxMets)}&nbsp;</span> METs</li>
+                                            <li>六分鐘行走測試結果： <span class="underline">&nbsp;${v(item.sixMWT)}&nbsp;</span> 公尺</li>
+                                        </ul>
+                                    </td>
+
+                                    <td class="col-func">
+                                        <div class="section-title">功能性評估：</div>
+                                        <ul>
+                                            <li>慣用手握力： <span class="underline">&nbsp;${v(item.gripStrength)}&nbsp;</span> kg</li>
+                                            <li>30秒手臂彎舉測試： <span class="underline">&nbsp;${v(item.bicepCurl)}&nbsp;</span> 下</li>
+                                            <li>30秒坐到站測試： <span class="underline">&nbsp;${v(item.sitToStand)}&nbsp;</span> 下</li>
+                                            <li>單腳站立測試： <span class="underline">&nbsp;${v(item.oneLegStance)}&nbsp;</span> 秒</li>
+                                            <li>(癌症個案)疲勞量表： <span class="underline">&nbsp;${v(item.fatigueScale)}&nbsp;</span> 分</li>
+                                        </ul>
+                                    </td>
+
+                                    <td class="col-ultra">
+                                        <div class="section-title">肌肉骨骼超音波檢查：</div>
+                                        <div style="padding-left: 0;">
+                                            <div>1. ${v(item.ultrasound1)}</div>
+                                            <div>2. ${v(item.ultrasound2)}</div>
+                                            <div>3. ${v(item.ultrasound3)}</div>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <tr style="height: 400px;">
+                                    <td class="col-medical">
+                                        <div class="section-title">醫療史總結：</div>
+                                        <ul>
+                                            <li>
+                                                <span class="label">主要診斷：</span>
+                                                <div>${v(item.mainDiagnosis)}</div>
+                                            </li>
+                                            <br>
+                                                <li>
+                                                    <span class="label">過去病史：</span>
+                                                    <div>${v(item.pastHistory)}</div>
+                                                </li>
+                                                <br>
+                                                    <li>
+                                                        <span class="label">手術史：</span>
+                                                        <div>${v(item.surgeryHistory)}</div>
+                                                    </li>
+                                                    <br>
+                                                        <li>
+                                                            <span class="label">藥物史：</span>
+                                                            <div>${v(item.medicationHistory)}</div>
+                                                        </li>
+                                                        <br>
+                                                            <li>
+                                                                <span class="label">活動史：</span>
+                                                                <span class="checkbox-item">${box(item.regularExercise, 'Yes')} 有</span>
+                                                                <span class="checkbox-item">${box(item.regularExercise, 'No')} 無</span>
+                                                                規律運動
+                                                            </li>
+                                                        </ul>
+                                                    </td>
+
+                                                    <td class="col-cancer">
+                                                        <div class="section-title">癌症病史：</div>
+                                                        <ul>
+                                                            <li>癌症種類：${v(item.cancerType)}</li>
+                                                            <li>癌症位置：${v(item.cancerLocation)}</li>
+                                                            <li>是否有轉移：${item.metastasis === 'Yes' ? '是' : '否'} <br> ${v(item.metastasisDesc)}</li>
+                                                            <br>
+                                                                <li>治療狀態：<br>${v(item.treatmentStatus)}</li>
+                                                                <br>
+                                                                    <li>已接受之治療：<br>${v(item.treatmentsReceived)}</li>
+                                                                    <br>
+                                                                        <li>治療相關之副作用：<br>${v(item.treatmentSideEffects)}</li>
+                                                                    </ul>
+                                                                </td>
+
+                                                                <td class="col-risk">
+                                                                    <div class="section-title">運動風險：</div>
+                                                                    <div style="margin-bottom: 20px;">
+                                                                        <div class="checkbox-item" style="display:block; margin-bottom:5px;">
+                                                                            ${box(item.riskLevel, 'High')} 高風險：需醫師評估後方能運動
+                                                                        </div>
+                                                                        <div class="checkbox-item" style="display:block; margin-bottom:5px;">
+                                                                            ${box(item.riskLevel, 'Medium')} 中風險：可在專家監督下運動
+                                                                        </div>
+                                                                        <div class="checkbox-item" style="display:block; margin-bottom:5px;">
+                                                                            ${box(item.riskLevel, 'Low')} 低風險：不用受監督，可自行運動
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <div class="section-title">運動強度：</div>
+                                                                    <div>
+                                                                        <div class="checkbox-item" style="display:block; margin-bottom:5px;">
+                                                                            ${box(item.intensityRec, 'NotRecommended')} 暫時不建議運動
+                                                                        </div>
+                                                                        <div class="checkbox-item" style="display:block; margin-bottom:5px;">
+                                                                            ${box(item.intensityRec, 'LowToMedium')} 初始低強度運動，可循序漸進至中等強度運動
+                                                                        </div>
+                                                                        <div class="checkbox-item" style="display:block; margin-bottom:5px;">
+                                                                            ${box(item.intensityRec, 'LowMediumToHigh')} 初始低至中等強度運動，可循序漸進至高強度運動
+                                                                        </div>
+                                                                        <div class="checkbox-item" style="display:block; margin-bottom:5px;">
+                                                                            ${box(item.intensityRec, 'MediumNoHigh')} 初始中等強度運動，暫不建議從事高強度運動
+                                                                        </div>
+                                                                        <div class="checkbox-item" style="display:block; margin-bottom:5px;">
+                                                                            ${box(item.intensityRec, 'MediumToHigh')} 初始中等強度運動，可循序漸進至高強度運動
+                                                                        </div>
+                                                                    </div>
+                                                                </td>
+
+                                                                <td class="col-special">
+                                                                    <div class="section-title">運動特殊考量：</div>
+                                                                    <div style="white-space: pre-wrap;">${v(item.specialConsiderations)}</div>
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                    </div>
+                                                    <script>
+                                                        window.onload = function() {
+                                                            setTimeout(function () {
+                                                                window.print();
+                                                            }, 500);
+                        };
+                                                        <\/script>
+                                                    </body>
+                                                </html>
+            `;
+
+            printWindow.document.write(html);
+            printWindow.document.close();
+        }
+    </script>
+</body>
+
+</html>
