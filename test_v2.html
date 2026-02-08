@@ -1379,6 +1379,7 @@
                     await Swal.fire({ icon: 'success', title: successMsg, confirmButtonColor: '#0ea5e9' });
 
                     // 重置編輯狀態
+                    const wasEditing = editingRowId;
                     editingRowId = null;
                     updateSubmitButton();
 
@@ -1387,6 +1388,12 @@
                     document.getElementById('fatigueValue').innerText = '0';
                     document.getElementById('meta-desc').classList.add('hidden');
                     document.getElementById('main-scroll').scrollTo(0, 0);
+
+                    // 如果是編輯模式，切換回搜尋頁籤並重新搜尋
+                    if (wasEditing) {
+                        switchTab('search');
+                        setTimeout(searchData, 500); // 稍微延遲以確保後端資料已寫入
+                    }
                 } else {
                     throw new Error((data && (data.error || data.raw)) ? (data.error || data.raw) : 'Unknown error');
                 }
