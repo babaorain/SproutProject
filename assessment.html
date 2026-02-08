@@ -1242,14 +1242,26 @@
                 cancelButtonText: '繼續編輯'
             }).then((result) => {
                 if (result.isConfirmed) {
+                    // 重置編輯狀態
+                    const wasEditing = currentRowId; // Use currentRowId to check if it was an edit
                     currentRowId = null;
-                    currentRecordData = null;
+                    currentRecordData = null; // Clear current record data
                     document.getElementById('assessmentForm').reset();
-                    // Reset custom fields if any
-                    document.getElementById('fatigueValue').innerText = '0';
-                    document.getElementById('meta-desc').classList.add('hidden');
+                    document.getElementById('date').valueAsDate = new Date(); // Reset date to today
+                    // Reset specialized fields if any
+                    const fatigueVal = document.getElementById('fatigueValue');
+                    if (fatigueVal) fatigueVal.innerText = '0';
+                    const metaDesc = document.getElementById('meta-desc');
+                    if (metaDesc) metaDesc.classList.add('hidden');
 
-                    updateSubmitButton();
+                    document.getElementById('main-scroll').scrollTo(0, 0);
+
+                    // 如果是編輯模式，切換回搜尋頁籤並重新搜尋
+                    if (wasEditing) {
+                        switchTab('search');
+                        setTimeout(searchData, 500);
+                    }
+                    updateSubmitButton(); // Update button state after resetting
                     Swal.fire({ icon: 'success', title: '已取消編輯', timer: 1500, showConfirmButton: false });
                 }
             });
@@ -1795,10 +1807,17 @@
                 body: new URLSearchParams(data)
             }).then(() => {
                 const msg = currentRowId ? '資料已更新成功' : '評估表已提交成功';
+                const wasEditing = currentRowId; // Capture before reset
+
                 Swal.fire('Success', msg, 'success').then(() => {
-                    if (!currentRowId) {
-                        document.getElementById('assessmentForm').reset();
-                        toggleCancerSection(false);
+                    document.getElementById('assessmentForm').reset();
+                    toggleCancerSection(false);
+
+                    if (wasEditing) {
+                        currentRowId = null;
+                        currentRecordData = null;
+                        switchTab('search');
+                        setTimeout(searchData, 500); // Auto-refresh search
                     }
                 });
             }).catch(err => {
