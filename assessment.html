@@ -78,6 +78,82 @@
         details>summary::-webkit-details-marker {
             display: none;
         }
+
+        /* ===== 手機版優化 ===== */
+        @media (max-width: 640px) {
+
+            /* 防止 iOS 自動放大輸入框 */
+            .form-input {
+                font-size: 16px;
+            }
+
+            /* 確保容器不溢出 */
+            .max-w-4xl {
+                overflow-x: hidden;
+            }
+
+            /* 修正 grid-cols-2 跑掉問題：在手機上變成單欄 */
+            .grid.grid-cols-2:not(.sm\:grid-cols-2) {
+                grid-template-columns: 1fr;
+            }
+
+            /* 修正有 gap-4 會造成溢出 */
+            .gap-4 {
+                gap: 0.75rem;
+            }
+
+            /* 修正 flex 內元素溢出 */
+            .flex>input,
+            .flex>select,
+            .flex>textarea {
+                min-width: 0;
+                flex: 1;
+            }
+
+            /* 修正 items-center gap-2 行內元素溢出 */
+            .flex.items-center.gap-2 {
+                flex-wrap: wrap;
+            }
+
+            /* 減少 padding */
+            .p-6 {
+                padding: 1rem;
+            }
+
+            .px-6 {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+
+            /* 修正醫療史區塊的內嵌輸入框 */
+            .space-y-2 .flex.items-center.gap-2 input.form-input {
+                width: auto;
+                min-width: 80px;
+            }
+        }
+
+        /* 極小螢幕優化 (iPhone SE 等) */
+        @media (max-width: 375px) {
+            .form-input {
+                height: 40px;
+                padding: 0 0.5rem;
+                font-size: 14px;
+            }
+
+            .p-3 {
+                padding: 0.5rem;
+            }
+
+            /* 減少標題文字大小 */
+            .text-lg {
+                font-size: 1rem;
+            }
+
+            /* checkbox/radio 旁邊文字 */
+            .check-card div {
+                padding: 0.5rem;
+            }
+        }
     </style>
 </head>
 
