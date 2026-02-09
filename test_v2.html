@@ -1882,11 +1882,7 @@
                                         </div>
                                         <div class="row">
                                             <span class="label">出生日期：</span>
-                                            <span>${v(item.dob).replace(/-/g, ' / ')}</span>
-                                        </div>
-                                        <div class="row">
-                                            <span class="label">年齡：</span>
-                                            <span>${v(item.age)} 歲</span>
+                                            <span>${v(item.dob).replace(/-/g, ' / ')}&nbsp;;&nbsp;${v(item.age)} 歲</span>
                                         </div>
                                         <div class="row">
                                             <span class="label">性別：</span>
@@ -1898,9 +1894,7 @@
                                         <div class="row">
                                             <span class="label">身高：</span>
                                             <span>${v(item.height)} cm</span>
-                                        </div>
-                                        <div class="row">
-                                            <span class="label">體重：</span>
+                                            <span class="label" style="margin-left: 15px;">體重：</span>
                                             <span>${v(item.weight)} kg</span>
                                         </div>
                                     </td>
