@@ -510,7 +510,7 @@
                                     <label class="block text-xs text-slate-500 mb-1">單腳站立 (秒)</label>
                                     <input type="number" name="oneLegStance"
                                         class="w-full bg-white border border-slate-300 rounded p-2 focus:border-primary-500 outline-none text-center font-mono text-xl"
-                                        placeholder="-" step="0.1" />
+                                        placeholder="-" step="0.01" />
                                 </div>
                             </div>
 
@@ -1535,7 +1535,7 @@
 
                     <div class="col-span-2 bg-slate-100 p-3 rounded-lg font-bold text-slate-700 mt-4">3. 功能性評估</div>
                     ${field('握力', item.gripStrength + ' kg')} ${field('手臂彎舉', item.bicepCurl + ' 下')}
-                    ${field('坐到站', item.sitToStand + ' 下')} ${field('單腳站立', item.oneLegStance + ' 秒')}
+                    ${field('坐到站', item.sitToStand + ' 下')} ${field('單腳站立', (item.oneLegStance ? parseFloat(item.oneLegStance).toFixed(2) : '') + ' 秒')}
                     ${field('疲勞量表', item.fatigueScale + ' 分', true)}
 
                     <div class="col-span-2 bg-slate-100 p-3 rounded-lg font-bold text-slate-700 mt-4">4. 肌肉骨骼超音波</div>
@@ -1915,7 +1915,7 @@
                                             <li>慣用手握力： <span class="underline">&nbsp;${v(item.gripStrength)}&nbsp;</span> kg</li>
                                             <li>30秒手臂彎舉測試： <span class="underline">&nbsp;${v(item.bicepCurl)}&nbsp;</span> 下</li>
                                             <li>30秒坐到站測試： <span class="underline">&nbsp;${v(item.sitToStand)}&nbsp;</span> 下</li>
-                                            <li>單腳站立測試： <span class="underline">&nbsp;${v(item.oneLegStance)}&nbsp;</span> 秒</li>
+                                            <li>單腳站立測試： <span class="underline">&nbsp;${item.oneLegStance ? parseFloat(item.oneLegStance).toFixed(2) : ''}&nbsp;</span> 秒</li>
                                             <li>(癌症個案)疲勞量表： <span class="underline">&nbsp;${v(item.fatigueScale)}&nbsp;</span> 分</li>
                                         </ul>
                                     </td>
