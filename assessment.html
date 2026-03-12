@@ -246,6 +246,16 @@
                                 <input type="date" name="date" class="form-input" required />
                             </div>
                             <div class="col-span-full md:col-span-1">
+                                <label class="block text-sm font-semibold text-slate-700 mb-1">院區</label>
+                                <select name="hospitalBranch" class="form-input">
+                                    <option value="高醫本院">高醫本院</option>
+                                    <option value="高醫岡山">高醫岡山</option>
+                                    <option value="小港醫院">小港醫院</option>
+                                    <option value="信義醫院">信義醫院</option>
+                                    <option value="部立屏東醫院">部立屏東醫院</option>
+                                </select>
+                            </div>
+                            <div class="col-span-full md:col-span-1">
                                 <label class="block text-sm font-semibold text-slate-700 mb-1">姓名</label>
                                 <input type="text" name="name" class="form-input" placeholder="請輸入姓名" required />
                             </div>
@@ -393,6 +403,9 @@
                                 <label class="flex items-center"><input type="checkbox" name="historyCardio"
                                         value="ImplantDevice"
                                         class="mr-2 rounded text-primary-600 focus:ring-primary-500">植入式心臟裝置</label>
+                                <label class="flex items-center"><input type="checkbox" name="historyCardio"
+                                        value="HeartFailure"
+                                        class="mr-2 rounded text-primary-600 focus:ring-primary-500">心衰竭</label>
                             </div>
 
                             <div class="space-y-2">
@@ -915,6 +928,36 @@
                                         </div>
                                     </div>
                                 </div>
+
+                                <!-- Other Treatment -->
+                                <div class="bg-white p-3 rounded border border-red-100">
+                                    <label class="font-semibold block mb-2">其他治療</label>
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-2 items-end">
+                                        <div>
+                                            <div class="mb-1 text-xs text-slate-500">治療種類</div>
+                                            <input type="text" name="txOther_drug" class="form-input text-sm">
+                                        </div>
+                                        <div>
+                                            <div class="mb-1 text-xs text-slate-500">日期/次數</div>
+                                            <input type="text" name="txOther_date" class="form-input text-sm">
+                                        </div>
+                                        <div>
+                                            <div class="mb-1 text-xs text-slate-500">造成心臟毒性?</div>
+                                            <div class="flex gap-3 items-center h-[44px]">
+                                                <label class="inline-flex items-center cursor-pointer">
+                                                    <input type="radio" name="txOther_toxicity" value="No"
+                                                        class="w-4 h-4 text-slate-600 focus:ring-slate-500" checked>
+                                                    <span class="ml-1 text-sm">否</span>
+                                                </label>
+                                                <label class="inline-flex items-center cursor-pointer">
+                                                    <input type="radio" name="txOther_toxicity" value="Yes"
+                                                        class="w-4 h-4 text-red-600 focus:ring-red-500">
+                                                    <span class="ml-1 text-sm text-red-700 font-medium">是</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
                             <!-- Issues Checklist -->
@@ -1303,7 +1346,7 @@
             // 心血管問題
             'Hypertension': '高血壓', 'Afib': '心房顫動', 'DVT': '深層靜脈栓塞',
             'Angina': '心絞痛', 'MI': '心肌梗塞', 'CAD': '冠狀動脈疾病',
-            'Valvular': '心臟瓣膜疾病', 'PAD': '周邊血管疾病', 'ImplantDevice': '植入式心臟裝置',
+            'Valvular': '心臟瓣膜疾病', 'PAD': '周邊血管疾病', 'ImplantDevice': '植入式心臟裝置', 'HeartFailure': '心衰竭',
             // 肌肉骨骼問題
             'Arthritis': '關節炎', 'Pain': '肌肉/關節/骨頭疼痛', 'Osteoporosis': '骨質疏鬆',
             'Gout': '痛風', 'Replacement': '關節置換',
@@ -1380,7 +1423,7 @@
                 'High': '高度活動', 'VeryHigh': '非常高度活動'
             })[l] || l || '-';
             const fmtTxStatus = (s) => ({
-                'PreTreatment': '治療前', 'OnTreatment': '治療中', 'PostTreatment': '治療後'
+                'ActiveSurveillance': '追蹤中', 'OnTreatment': '治療中', 'Completed': '已完成治療'
             })[s] || s || '-';
 
             content.innerHTML = `
@@ -1390,6 +1433,7 @@
                         <h3 class="font-bold text-primary-700 mb-3 border-b pb-2">1. 基本資料</h3>
                         <div class="grid grid-cols-2 gap-2">
                             <div><b>填寫日期:</b> ${fmtDate(data.date)}</div>
+                            <div><b>院區:</b> ${data.hospitalBranch || '-'}</div>
                             <div><b>姓名:</b> ${data.name || '-'}</div>
                             <div><b>性別:</b> ${fmtGender(data.gender)}</div>
                             <div><b>出生日期:</b> ${fmtDate(data.dob)}</div>
@@ -1471,13 +1515,14 @@
                         </div>
                         <div class="space-y-1 border-t border-red-200 pt-2">
                             <div class="font-medium text-red-700 mb-1">已接受治療:</div>
-                            ${data.txSurgery ? `<div>• <b>手術:</b> ${data.txSurgery}</div>` : ''}
-                            ${data.txChemo ? `<div>• <b>化療:</b> ${data.txChemo}</div>` : ''}
-                            ${data.txRadio ? `<div>• <b>放療:</b> ${data.txRadio}</div>` : ''}
-                            ${data.txHormone ? `<div>• <b>荷爾蒙:</b> ${data.txHormone}</div>` : ''}
-                            ${data.txTarget ? `<div>• <b>標靶:</b> ${data.txTarget}</div>` : ''}
-                            ${data.txImmuno ? `<div>• <b>免疫:</b> ${data.txImmuno}</div>` : ''}
-                            ${(!data.txSurgery && !data.txChemo && !data.txRadio && !data.txHormone && !data.txTarget && !data.txImmuno) ? '<div class="text-slate-400">無治療紀錄</div>' : ''}
+                            ${(data.txSurgery_type || data.txSurgery) ? `<div>• <b>手術:</b> ${data.txSurgery_type || data.txSurgery}${data.txSurgery_date ? ' (' + fmtDate(data.txSurgery_date) + ')' : ''}</div>` : ''}
+                            ${(data.txChemo_drug || data.txChemo) ? `<div>• <b>化療:</b> ${data.txChemo_drug || data.txChemo}${data.txChemo_date ? ' (' + data.txChemo_date + ')' : ''}${data.txChemo_toxicity === 'Yes' ? ' <span class="text-red-600">[心臟毒性:是]</span>' : ''}</div>` : ''}
+                            ${(data.txRadio_type || data.txRadio) ? `<div>• <b>放療:</b> ${data.txRadio_type || data.txRadio}${data.txRadio_date ? ' (' + data.txRadio_date + ')' : ''}${data.txRadio_toxicity === 'Yes' ? ' <span class="text-red-600">[心臟毒性:是]</span>' : ''}</div>` : ''}
+                            ${(data.txHormone_drug || data.txHormone) ? `<div>• <b>荷爾蒙:</b> ${data.txHormone_drug || data.txHormone}${data.txHormone_date ? ' (' + data.txHormone_date + ')' : ''}${data.txHormone_toxicity === 'Yes' ? ' <span class="text-red-600">[心臟毒性:是]</span>' : ''}</div>` : ''}
+                            ${(data.txTarget_drug || data.txTarget) ? `<div>• <b>標靶:</b> ${data.txTarget_drug || data.txTarget}${data.txTarget_date ? ' (' + data.txTarget_date + ')' : ''}${data.txTarget_toxicity === 'Yes' ? ' <span class="text-red-600">[心臟毒性:是]</span>' : ''}</div>` : ''}
+                            ${(data.txImmuno_drug || data.txImmuno) ? `<div>• <b>免疫:</b> ${data.txImmuno_drug || data.txImmuno}${data.txImmuno_date ? ' (' + data.txImmuno_date + ')' : ''}${data.txImmuno_toxicity === 'Yes' ? ' <span class="text-red-600">[心臟毒性:是]</span>' : ''}</div>` : ''}
+                            ${(data.txOther_drug || data.txOther) ? `<div>• <b>其他治療:</b> ${data.txOther_drug || data.txOther}${data.txOther_date ? ' (' + data.txOther_date + ')' : ''}${data.txOther_toxicity === 'Yes' ? ' <span class="text-red-600">[心臟毒性:是]</span>' : ''}</div>` : ''}
+                            ${!(data.txSurgery_type || data.txSurgery) && !(data.txChemo_drug || data.txChemo) && !(data.txRadio_type || data.txRadio) && !(data.txHormone_drug || data.txHormone) && !(data.txTarget_drug || data.txTarget) && !(data.txImmuno_drug || data.txImmuno) && !(data.txOther_drug || data.txOther) ? '<div class="text-slate-400">無治療紀錄</div>' : ''}
                         </div>
                         ${data.cancerIssues ? `<div class="mt-2 border-t border-red-200 pt-2"><b>相關問題:</b> ${data.cancerIssues}</div>` : ''}
                     </div>
@@ -1546,7 +1591,7 @@
             const dateFields = ['date', 'dob', 'cancerDxDate'];
 
             // Simple text fields
-            const textFields = ['name', 'phone', 'address', 'workStatus', 'maritalStatus',
+            const textFields = ['name', 'phone', 'address', 'hospitalBranch', 'workStatus', 'maritalStatus',
                 'alcohol', 'smoking', 'surgeryHistory', 'medicationHistory', 'allergyHistory',
                 'preferredExercise', 'equipment', 'goals', 'otherSupport',
                 'cancerType', 'cancerLocation', 'metastasis', 'historyAutoimmune'];
@@ -1626,7 +1671,7 @@
             }
 
             // Cancer treatment fields - handle both legacy combined format and individual fields
-            const txPrefixes = ['txSurgery', 'txChemo', 'txRadio', 'txHormone', 'txTarget', 'txImmuno'];
+            const txPrefixes = ['txSurgery', 'txChemo', 'txRadio', 'txHormone', 'txTarget', 'txImmuno', 'txOther'];
             txPrefixes.forEach(prefix => {
                 // First try individual fields (new format)
                 ['drug', 'type', 'date'].forEach(suffix => {
@@ -1714,7 +1759,7 @@
             const formData = new FormData(form);
 
             // Simple fields
-            ['date', 'name', 'dob', 'gender', 'phone', 'address', 'workStatus', 'maritalStatus',
+            ['date', 'name', 'dob', 'gender', 'phone', 'address', 'hospitalBranch', 'workStatus', 'maritalStatus',
                 'alcohol', 'smoking', 'currentActivityLevel', 'surgeryHistory', 'medicationHistory',
                 'allergyHistory', 'preDxActivityLevel', 'preferredExercise', 'equipment', 'goals',
                 'otherSupport', 'cancerType', 'cancerLocation', 'cancerDxDate', 'metastasis',
@@ -1757,7 +1802,7 @@
             data.cancerIssues = collectChecks('cancerIssues');
 
             // Cancer treatment fields - save individually for proper read/write
-            const txPrefixes = ['txSurgery', 'txChemo', 'txRadio', 'txHormone', 'txTarget', 'txImmuno'];
+            const txPrefixes = ['txSurgery', 'txChemo', 'txRadio', 'txHormone', 'txTarget', 'txImmuno', 'txOther'];
             txPrefixes.forEach(prefix => {
                 const drugEl = document.querySelector(`input[name="${prefix}_drug"]`);
                 const typeEl = document.querySelector(`input[name="${prefix}_type"]`);
@@ -1930,6 +1975,10 @@
                                         <span class="label">評估日期</span>
                                         <span class="value">${fmtDate(item.date)}</span>
                                     </div>
+                                    <div class="field inline" style="grid-column: span 2;">
+                                        <span class="label">院區：</span>
+                                        <span class="value">${v(item.hospitalBranch)}</span>
+                                    </div>
                                     <div class="field inline">
                                         <span class="label">姓名</span>
                                         <span class="value">${v(item.name)}</span>
@@ -2089,7 +2138,8 @@
                                         ${(item.txHormone_drug || item.txHormone) ? '<div style="margin-bottom:4px;"><strong>賀爾蒙治療:</strong> ' + cleanTx(item.txHormone_drug || item.txHormone) + (item.txHormone_date ? ' (' + v(item.txHormone_date) + ')' : '') + (item.txHormone_toxicity === 'Yes' || (item.txHormone && String(item.txHormone).includes('HeartTox: Yes')) ? ' <span style="color:#dc2626;">[心臟毒性:是]</span>' : '') + '</div>' : ''}
                                         ${(item.txTarget_drug || item.txTarget) ? '<div style="margin-bottom:4px;"><strong>標靶治療:</strong> ' + cleanTx(item.txTarget_drug || item.txTarget) + (item.txTarget_date ? ' (' + v(item.txTarget_date) + ')' : '') + (item.txTarget_toxicity === 'Yes' || (item.txTarget && String(item.txTarget).includes('HeartTox: Yes')) ? ' <span style="color:#dc2626;">[心臟毒性:是]</span>' : '') + '</div>' : ''}
                                         ${(item.txImmuno_drug || item.txImmuno) ? '<div style="margin-bottom:4px;"><strong>免疫治療:</strong> ' + cleanTx(item.txImmuno_drug || item.txImmuno) + (item.txImmuno_date ? ' (' + v(item.txImmuno_date) + ')' : '') + (item.txImmuno_toxicity === 'Yes' || (item.txImmuno && String(item.txImmuno).includes('HeartTox: Yes')) ? ' <span style="color:#dc2626;">[心臟毒性:是]</span>' : '') + '</div>' : ''}
-                                        ${!(item.txSurgery_type || item.txSurgery) && !(item.txChemo_drug || item.txChemo) && !(item.txRadio_type || item.txRadio) && !(item.txHormone_drug || item.txHormone) && !(item.txTarget_drug || item.txTarget) && !(item.txImmuno_drug || item.txImmuno) ? '無紀錄' : ''}
+                                        ${(item.txOther_drug || item.txOther) ? '<div style="margin-bottom:4px;"><strong>其他治療:</strong> ' + cleanTx(item.txOther_drug || item.txOther) + (item.txOther_date ? ' (' + v(item.txOther_date) + ')' : '') + (item.txOther_toxicity === 'Yes' || (item.txOther && String(item.txOther).includes('HeartTox: Yes')) ? ' <span style="color:#dc2626;">[心臟毒性:是]</span>' : '') + '</div>' : ''}
+                                        ${!(item.txSurgery_type || item.txSurgery) && !(item.txChemo_drug || item.txChemo) && !(item.txRadio_type || item.txRadio) && !(item.txHormone_drug || item.txHormone) && !(item.txTarget_drug || item.txTarget) && !(item.txImmuno_drug || item.txImmuno) && !(item.txOther_drug || item.txOther) ? '無紀錄' : ''}
                                             `;
                     })()}
                                     </div>
